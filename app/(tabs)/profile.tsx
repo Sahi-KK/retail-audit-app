@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import * as Updates from 'expo-updates';
 import { useAuditStore } from '../../store/auditStore';
 import { User, ShieldCheck, Save, LogOut } from 'lucide-react-native';
 
