@@ -40,11 +40,8 @@ jobs:
         run: npm install
 
       - name: 🔨 Build Standalone APK (Expo Cloud)
-        # Added Auto-Heal: Retries up to 3 times on transient failure
-        run: |
-          for i in {1..3}; do
-            npx eas-cli build --platform android --profile preview --non-interactive && break || sleep 60
-          done
+        # We switch to cloud build for the first run to handle automatic Keystore generation
+        run: npx eas-cli build --platform android --profile preview --non-interactive
 
       # Note: Cloud builds provide the URL in the logs.
       # You can also use 'eas build:list' to see them.
