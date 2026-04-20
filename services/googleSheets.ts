@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 // REPLACE THIS with your deployed Google Apps Script URL
-const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbxvuGteIcBY7Ah56xzsizMtnr0spRpfDO9YtMKosawJC4YAwTOQQ-HZEZbGpz6dBAXr/exec";
+const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbxZSRw0ze_WE9sWTBXFpAoyqXaDEnnDnGcOvZI5Flv8B68_rCMQe1onFbPIZ6tkb0_q/exec";
 
 export interface SyncResult {
   status: 'success' | 'error';
