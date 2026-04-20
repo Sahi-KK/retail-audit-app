@@ -83,7 +83,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         </Text>
 
         <Text className="text-[#C9A84C]/20 text-center text-[8px] font-black uppercase tracking-[2px] mt-8">
-          Enterprise v1.0.0 • Secure Sync Active
+          Enterprise v1.0.0 • GHOST ACTIVE • Secure Sync
         </Text>
       </View>
     </KeyboardAvoidingView>
