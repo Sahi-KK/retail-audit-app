@@ -34,12 +34,9 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm install
 
-      - name: 🔨 Build Standalone APK (EAS Local)
-        # We use --local to avoid the EAS cloud queue
-        run: npx eas-cli build --platform android --profile preview --non-interactive --local --output=./retail-audit-v1.apk
+      - name: 🔨 Build Standalone APK (Expo Cloud)
+        # We switch to cloud build for the first run to handle automatic Keystore generation
+        run: npx eas-cli build --platform android --profile preview --non-interactive
 
-      - name: 📤 Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: retail-audit-apk
-          path: ./retail-audit-v1.apk
+      # Note: Cloud builds provide the URL in the logs.
+      # You can also use 'eas build:list' to see them.
