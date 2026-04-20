@@ -36,11 +36,28 @@ export default function GlobalHistoryScreen() {
   }, [completedAudits, search]);
 
   const loadCloudHistory = async () => {
-    if (!auth.auditorId) return;
+    if (!auth.auditorId) {
+      Alert.alert("🚨 Debug: No Auditor ID", "Your profile is missing an ID. Please set it in the Profile tab.");
+      return;
+    }
+    
     setIsLoadingCloud(true);
-    const data = await googleSheetsService.fetchHistory(auth.auditorId);
-    setCloudAudits(data);
-    setIsLoadingCloud(false);
+    try {
+      console.log("Fetching history for:", auth.auditorId);
+      const data = await googleSheetsService.fetchHistory(auth.auditorId);
+      
+      // DIAGNOSTIC POP-UP: Reveal the handshake
+      Alert.alert(
+        "🛰️ Ghost Hub Diagnostic",
+        `Searching for: [${auth.auditorId}]\n\nCloud Response: ${data.length} records found.\n\n${data.length === 0 ? "Potential ID mismatch in the Master Spreadsheet." : "Success! Signal clear."}`
+      );
+      
+      setCloudAudits(data);
+    } catch (e) {
+      Alert.alert("🚨 Debug: Hub Error", e instanceof Error ? e.message : "Unknown connectivity issue");
+    } finally {
+      setIsLoadingCloud(false);
+    }
   };
 
   useEffect(() => {
