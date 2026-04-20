@@ -42,7 +42,9 @@ export const googleSheetsService = {
 
   fetchHistory: async (auditorId: string): Promise<any[]> => {
     try {
-      const response = await fetch(`${CLOUD_SYNC_URL}?action=getHistory&auditorId=${auditorId}`, {
+      // GHOST SYNC: Use encodeURIComponent to handle IDs with spaces or symbols
+      const encodedId = encodeURIComponent(auditorId);
+      const response = await fetch(`${CLOUD_SYNC_URL}?action=getHistory&auditorId=${encodedId}`, {
         method: 'GET',
       });
       const result = await response.json();
