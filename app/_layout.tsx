@@ -9,35 +9,48 @@ import 'react-native-reanimated';
 import '../global.css';
 
 function UpdateGuard({ children }: { children: React.ReactNode }) {
+  const [isChecking, setIsChecking] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateReady, setUpdateReady] = useState(false);
 
   useEffect(() => {
     async function onFetchUpdateAsync() {
       try {
+        // Minimum wait so the user can see the "Checking" status
+        const startTime = Date.now();
+        
         const update = await Updates.checkForUpdateAsync();
+        
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, 1500 - elapsed);
+        
         if (update.isAvailable) {
           setIsUpdating(true);
           await Updates.fetchUpdateAsync();
           setUpdateReady(true);
-          // Optional: Give it a sec for the user to see the success state
           setTimeout(async () => {
              await Updates.reloadAsync();
           }, 1500);
+        } else {
+          // Stay on "Checking" screen for at least 1.5s for visual confirmation
+          setTimeout(() => {
+            setIsChecking(false);
+          }, remaining);
         }
       } catch (error) {
-        // Fallback silently if update fails/offline
         console.warn('Update check failed:', error);
+        setIsChecking(false);
       }
     }
 
-    // Only run this in production (non-dev)
     if (!__DEV__) {
       onFetchUpdateAsync();
+    } else {
+      setIsChecking(false);
     }
   }, []);
 
-  if (isUpdating) {
+  if (isChecking || isUpdating) {
     return (
       <View className="flex-1 bg-[#0A0F1E] items-center justify-center px-10">
         <View className="items-center mb-10">
@@ -49,21 +62,23 @@ function UpdateGuard({ children }: { children: React.ReactNode }) {
              )}
            </View>
            <Text className="text-white text-2xl font-black text-center">
-             {updateReady ? 'Update Ready' : 'Cloud Sync Active'}
+             {updateReady ? 'Protocol Updated' : 'Ghost Command Sync'}
            </Text>
-           <Text className="text-[#C9A84C] text-[10px] font-black uppercase tracking-[3px] mt-2">
-             {updateReady ? 'RESTARTING APP...' : 'DOWNLOADING NEW FEATURES'}
+           <Text className="text-[#C9A84C] text-[10px] font-black uppercase tracking-[3px] mt-2 text-center">
+             {updateReady ? 'RESTARTING APP...' : isUpdating ? 'DOWNLOADING NEW FEATURES' : 'VERIFYING CLOUD PROTOCOLS'}
            </Text>
         </View>
 
         {!updateReady && (
           <View className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-            <View className="h-full bg-[#C9A84C] w-2/3" />
+            <ActivityIndicator size="small" color="#C9A84C" />
           </View>
         )}
         
         <Text className="text-slate-500 text-xs text-center mt-6 leading-relaxed">
-          The Master Hub is pushing the latest protocol and security patches to your device.
+          {isUpdating 
+            ? 'Beaming latest logic and security patches to your device.' 
+            : 'Establishing secure link with the Master Hub...'}
         </Text>
       </View>
     );
