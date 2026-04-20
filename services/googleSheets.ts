@@ -11,37 +11,33 @@ export interface SyncResult {
 export const googleSheetsService = {
   syncAudit: async (auditData: any): Promise<SyncResult> => {
     if (!CLOUD_SYNC_URL) {
-      console.warn("Cloud Sync URL not configured.");
-      return { status: 'error', message: 'Cloud Sync URL is not configured in services/googleSheets.ts' };
+      return { status: 'error', message: 'Cloud Sync URL not configured.' };
     }
 
-    try {
-      const response = await fetch(CLOUD_SYNC_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
-        body: JSON.stringify(auditData),
-      });
-
-      const responseText = await response.text();
-
-      if (!response.ok && response.status !== 0) {
-        return { status: 'error', message: `HTTP ${response.status}: ${responseText.substring(0, 100)}` };
-      }
-
+    // GHOST SHIELD: Retry logic for flaky connections
+    let attempts = 0;
+    while (attempts < 2) {
       try {
-        const result = JSON.parse(responseText);
-        return result;
-      } catch (e) {
-        return { status: 'error', message: `Invalid JSON: ${responseText.substring(0, 100)}` };
+        const response = await fetch(CLOUD_SYNC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(auditData),
+        });
+
+        const responseText = await response.text();
+        if (response.ok) {
+           return JSON.parse(responseText);
+        }
+        attempts++;
+      } catch (error) {
+        attempts++;
+        if (attempts === 2) {
+           const msg = error instanceof Error ? error.message : 'Unknown Hub Error';
+           return { status: 'error', message: `MASTER HUB UNREACHABLE: ${msg}` };
+        }
       }
-    } catch (error) {
-      console.error("Cloud Sync Failed:", error);
-      const msg = error instanceof Error ? error.message : 'Unknown network error';
-      Alert.alert("🚨 CLOUD SYNC ERROR", msg);
-      return { status: 'error', message: msg };
     }
+    return { status: 'error', message: 'Master Hub Connection Timed Out' };
   },
 
   fetchHistory: async (auditorId: string): Promise<any[]> => {
