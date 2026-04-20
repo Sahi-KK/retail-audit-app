@@ -3,6 +3,11 @@ name: 'Audit App Standalone Build'
 on:
   push:
     branches: [main]
+    paths:
+      - 'app.json'
+      - 'eas.json'
+      - '.github/workflows/android-build.yml'
+      - 'assets/images/**'
   workflow_dispatch: # Allows manual build triggers
 
 jobs:
