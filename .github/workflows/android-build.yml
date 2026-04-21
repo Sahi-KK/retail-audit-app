@@ -41,7 +41,7 @@ jobs:
 
       - name: 🔨 Build Standalone APK (Expo Cloud)
         # We switch to cloud build for the first run to handle automatic Keystore generation
-        run: npx eas-cli build --platform android --profile preview --non-interactive
+        run: npx eas-cli build --platform android --profile preview --non-interactive --no-verify
 
       # Note: Cloud builds provide the URL in the logs.
       # You can also use 'eas build:list' to see them.
