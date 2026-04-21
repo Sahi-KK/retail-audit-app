@@ -96,24 +96,16 @@ function UpdateGuard({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
-  const content = (
-    <AuthGuard>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="(audit)" />
-        <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
-      </Stack>
-      <StatusBar style="dark" />
-    </AuthGuard>
-  );
-
-  if (Platform.OS === 'web') {
-    return content;
-  }
-
   return (
     <UpdateGuard>
-      {content}
+      <AuthGuard>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(audit)" />
+          <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
+        </Stack>
+        <StatusBar style="dark" />
+      </AuthGuard>
     </UpdateGuard>
   );
 }

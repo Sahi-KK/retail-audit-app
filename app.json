@@ -34,14 +34,7 @@
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png",
-      "bundler": "metro",
-      "description": "EssilorLuxottica Strategic Audit Platform",
-      "backgroundColor": "#0A0F1E",
-      "themeColor": "#C9A84C",
-      "display": "standalone",
-      "orientation": "portrait",
-      "lang": "en-IN",
-      "baseUrl": "/retail-audit-app"
+      "bundler": "metro"
     },
     "plugins": [
       [
@@ -74,8 +67,7 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true,
-      "baseUrl": "/retail-audit-app"
+      "reactCompiler": true
     },
     "extra": {
       "router": {},

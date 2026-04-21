@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useAuditStore } from '../store/auditStore';
 import { User, ShieldCheck, ArrowRight, ClipboardCheck } from 'lucide-react-native';
 
@@ -30,13 +30,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   const notify = (title: string, message: string) => {
-    if (Platform.OS === 'web') {
-      console.warn(`[AUTH] ${title}: ${message}`);
-      alert(`${title}\n\n${message}`);
-    } else {
-      // Native fallback
-      console.log(`${title}: ${message}`);
-    }
+    Alert.alert(title, message, [{ text: "OK" }]);
   };
 
   const handleSignIn = () => {
@@ -52,11 +46,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const Container = Platform.OS === 'web' ? View : KeyboardAvoidingView;
-
   return (
-    <Container 
-      {...(Platform.OS !== 'web' ? { behavior: Platform.OS === 'ios' ? 'padding' : 'height' } : {})}
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1 bg-[#0A0F1E]"
     >
       <View className="flex-1 px-8 justify-center">
@@ -115,6 +107,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           Enterprise v2.3.0 • GHOST STABLE • Sync Active
         </Text>
       </View>
-    </Container>
+    </KeyboardAvoidingView>
   );
 }

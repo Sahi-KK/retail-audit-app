@@ -2,7 +2,6 @@
   "name": "audit-app",
   "main": "expo-router/entry",
   "version": "2.3.0",
-  "homepage": "https://Sahi-KK.github.io/retail-audit-app",
   "scripts": {
     "start": "expo start",
     "dev": "expo start --dev-client",
