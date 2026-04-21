@@ -48,6 +48,13 @@ function UpdateGuard({ children }: { children: React.ReactNode }) {
     } else {
       setIsChecking(false);
     }
+    
+    // FAIL-SAFE: Force start after 5 seconds no matter what
+    const forceStart = setTimeout(() => {
+        setIsChecking(false);
+    }, 5000);
+
+    return () => clearTimeout(forceStart);
   }, []);
 
   if (isChecking || isUpdating) {
