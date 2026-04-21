@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Text, Pressable, Alert, ScrollView, TextInput, Modal } from 'react-native';
-import { useAuditStore } from '../store/auditStore';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Store, Plus, Pencil, Trash2, RefreshCw, X, ShieldCheck, MapPin } from 'lucide-react-native';
+import { ArrowLeft, Pencil, Plus, RefreshCw, ShieldCheck, Trash2, X } from 'lucide-react-native';
+import React from 'react';
+import { Alert, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Badge } from '../components/Badge';
 import { locationData, StoreLocation } from '../data/locationData';
+import { useAuditStore } from '../store/auditStore';
 
 export default function ManageStoresScreen() {
   const insets = useSafeAreaInsets();
@@ -30,12 +30,12 @@ export default function ManageStoresScreen() {
     const unique = [];
     const seen = new Set();
     for (const s of combined) {
-       if (!seen.has(s.code)) {
-         seen.add(s.code);
-         unique.push(s);
-       }
+      if (!seen.has(s.code)) {
+        seen.add(s.code);
+        unique.push(s);
+      }
     }
-    return unique.sort((a,b) => a.name.localeCompare(b.name));
+    return unique.sort((a, b) => a.name.localeCompare(b.name));
   }, [customStores]);
 
   const handleAddStore = () => {
@@ -70,10 +70,12 @@ export default function ManageStoresScreen() {
       "This will revert all default stores to their original state. Custom entries are safe.",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Restore", onPress: () => {
-          const defaults = locationData["Karnataka"]["Bengaluru"];
-          for (const d of defaults) deleteCustomStore(d.code);
-        }}
+        {
+          text: "Restore", onPress: () => {
+            const defaults = locationData["Karnataka"]["Bengaluru"];
+            for (const d of defaults) deleteCustomStore(d.code);
+          }
+        }
       ]
     );
   };
@@ -99,25 +101,25 @@ export default function ManageStoresScreen() {
         <Text className="text-white text-3xl font-black tracking-tight">Enterprise Directory</Text>
       </View>
 
-      <ScrollView 
+      <ScrollView
         className="flex-1 px-6 pt-8"
         contentContainerStyle={{ paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Add Section */}
         <View className="mb-8">
-          <Pressable 
+          <Pressable
             onPress={() => setIsAddExpanded(!isAddExpanded)}
             className="bg-gold p-5 rounded-[24px] flex-row items-center justify-between shadow-xl active:scale-[0.98]"
           >
             <View className="flex-row items-center">
-               <View className="bg-slate-900/10 p-2 rounded-xl mr-4">
-                 <Plus size={20} color="#0F172A" strokeWidth={3} />
-               </View>
-               <Text className="text-slate-900 font-black text-sm uppercase tracking-tight">Register New Location</Text>
+              <View className="bg-slate-900/10 p-2 rounded-xl mr-4">
+                <Plus size={20} color="#0F172A" strokeWidth={3} />
+              </View>
+              <Text className="text-slate-900 font-black text-sm uppercase tracking-tight">Register New Location</Text>
             </View>
             <View className={`transform ${isAddExpanded ? 'rotate-45' : 'rotate-0'}`}>
-               <Plus size={16} color="#0F172A" />
+              <Plus size={16} color="#0F172A" />
             </View>
           </Pressable>
 
@@ -128,9 +130,8 @@ export default function ManageStoresScreen() {
                   <Pressable
                     key={b}
                     onPress={() => setNewBrand(b)}
-                    className={`flex-1 py-4 px-1 rounded-2xl border items-center ${
-                      newBrand === b ? 'bg-slate-900 border-slate-900' : 'bg-slate-50 border-slate-100'
-                    }`}
+                    className={`flex-1 py-4 px-1 rounded-2xl border items-center ${newBrand === b ? 'bg-slate-900 border-slate-900' : 'bg-slate-50 border-slate-100'
+                      }`}
                   >
                     <Text className={`text-[10px] font-black uppercase tracking-widest ${newBrand === b ? 'text-white' : 'text-slate-400'}`}>
                       {b}
@@ -163,10 +164,10 @@ export default function ManageStoresScreen() {
 
         {/* List Section */}
         <View className="mb-6 px-2 flex-row justify-between items-center">
-           <Text className="text-slate-400 text-[10px] font-black uppercase tracking-[3px]">Managed Registry</Text>
-           <View className="bg-slate-100 px-3 py-1 rounded-full">
-             <Text className="text-slate-500 text-[10px] font-black">{allStores.length} ACTIVE</Text>
-           </View>
+          <Text className="text-slate-400 text-[10px] font-black uppercase tracking-[3px]">Managed Registry</Text>
+          <View className="bg-slate-100 px-3 py-1 rounded-full">
+            <Text className="text-slate-500 text-[10px] font-black">{allStores.length} ACTIVE</Text>
+          </View>
         </View>
 
         <View className="gap-y-5">
@@ -191,7 +192,7 @@ export default function ManageStoresScreen() {
                   </Pressable>
                 </View>
               </View>
-              
+
               <View className="flex-row items-center pt-5 border-t border-slate-50">
                 <ShieldCheck size={14} color="#10B981" />
                 <Text className="ml-2 text-emerald-500 text-[10px] font-black uppercase tracking-widest">Active Status Verified</Text>
@@ -221,9 +222,8 @@ export default function ManageStoresScreen() {
                   <Pressable
                     key={b}
                     onPress={() => setEditBrand(b)}
-                    className={`flex-1 py-5 rounded-[24px] border items-center ${
-                      editBrand === b ? 'bg-slate-900 border-slate-900 shadow-lg' : 'bg-slate-50 border-slate-100'
-                    }`}
+                    className={`flex-1 py-5 rounded-[24px] border items-center ${editBrand === b ? 'bg-slate-900 border-slate-900 shadow-lg' : 'bg-slate-50 border-slate-100'
+                      }`}
                   >
                     <Text className={`text-[11px] font-black uppercase tracking-widest ${editBrand === b ? 'text-white' : 'text-slate-400'}`}>
                       {b}

@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 // REPLACE THIS with your deployed Google Apps Script URL
 const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbxZSRw0ze_WE9sWTBXFpAoyqXaDEnnDnGcOvZI5Flv8B68_rCMQe1onFbPIZ6tkb0_q/exec";
 
@@ -9,10 +8,15 @@ export interface SyncResult {
 }
 
 export const googleSheetsService = {
-  syncAudit: async (auditData: any): Promise<SyncResult> => {
+  syncAudit: async (auditData: any, pdfBase64?: string): Promise<SyncResult> => {
     if (!CLOUD_SYNC_URL) {
       return { status: 'error', message: 'Cloud Sync URL not configured.' };
     }
+
+    const payload = {
+      auditData,
+      pdfBase64
+    };
 
     // GHOST SHIELD: Retry logic for flaky connections
     let attempts = 0;
@@ -21,19 +25,19 @@ export const googleSheetsService = {
         const response = await fetch(CLOUD_SYNC_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(auditData),
+          body: JSON.stringify(payload),
         });
 
         const responseText = await response.text();
         if (response.ok) {
-           return JSON.parse(responseText);
+          return JSON.parse(responseText);
         }
         attempts++;
       } catch (error) {
         attempts++;
         if (attempts === 2) {
-           const msg = error instanceof Error ? error.message : 'Unknown Hub Error';
-           return { status: 'error', message: `MASTER HUB UNREACHABLE: ${msg}` };
+          const msg = error instanceof Error ? error.message : 'Unknown Hub Error';
+          return { status: 'error', message: `MASTER HUB UNREACHABLE: ${msg}` };
         }
       }
     }
@@ -42,9 +46,7 @@ export const googleSheetsService = {
 
   fetchHistory: async (auditorId: string): Promise<any[]> => {
     try {
-      // GHOST SYNC: Use encodeURIComponent to handle IDs with spaces or symbols
-      const encodedId = encodeURIComponent(auditorId);
-      const response = await fetch(`${CLOUD_SYNC_URL}?action=getHistory&auditorId=${encodedId}`, {
+      const response = await fetch(`${CLOUD_SYNC_URL}?action=getHistory&auditorId=${auditorId}`, {
         method: 'GET',
       });
       const result = await response.json();

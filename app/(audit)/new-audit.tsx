@@ -90,14 +90,33 @@ export default function NewAuditScreen() {
   };
 
   const finalizeSubmission = async () => {
+    // 1. Calculate Category Breakdown for the PDF
+    const categoryBreakdown = CATEGORIES.reduce((acc, cat) => {
+      const catQuestions = AUDIT_QUESTIONS.filter(q => q.category === cat);
+      let earned = 0;
+      let total = 0;
+      catQuestions.forEach(q => {
+        const score = scores[q.id] || 0;
+        earned += (score / 10) * q.weight;
+        total += q.weight;
+      });
+      acc[cat.toLowerCase()] = total > 0 ? Math.round((earned / total) * 100) : 0;
+      return acc;
+    }, {} as { [key: string]: number });
+
     const auditData = {
       id: Date.now().toString(),
-      auditor: headerInfo.auditorName,
-      auditorId: headerInfo.auditorId,
-      store: headerInfo.store,
-      storeCode: headerInfo.storeCode,
-      brand: headerInfo.storeBrand,
-      score: stats.percentage,
+      header: {
+        store: headerInfo.store,
+        storeCode: headerInfo.storeCode,
+        storeBrand: headerInfo.storeBrand,
+        auditorName: headerInfo.auditorName,
+        date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+      },
+      percentage: stats.percentage,
+      earned: stats.earned,
+      total: stats.total,
+      categoryBreakdown,
       details: scores,
       timestamp: new Date().toISOString()
     };
@@ -105,7 +124,13 @@ export default function NewAuditScreen() {
     setIsSyncing(true);
     try {
       const { googleSheetsService } = require('../../services/googleSheets');
-      const result = await googleSheetsService.syncAudit(auditData);
+      const { pdfService } = require('../../services/pdfService');
+
+      // 2. Generate PDF locally (Base64)
+      const pdfBase64 = await pdfService.generateAuditPdf(auditData);
+
+      // 3. Sync to Hub (Data + Document)
+      const result = await googleSheetsService.syncAudit(auditData, pdfBase64);
       
       if (result.status === 'success') {
         submitAudit({
@@ -113,7 +138,7 @@ export default function NewAuditScreen() {
           earned: stats.earned,
           total: stats.total
         });
-        Alert.alert("Success", "Audit submitted and synced to Cloud Hub.");
+        Alert.alert("Success", "Audit finalized and archived in Store Folder.");
         router.replace('/(tabs)');
       } else {
         throw new Error(result.message);
@@ -125,7 +150,7 @@ export default function NewAuditScreen() {
         earned: stats.earned,
         total: stats.total
       });
-      Alert.alert("Partial Success", "Audit saved locally, but Cloud Sync failed. Please check network.");
+      Alert.alert("Partial Success", "Audit saved locally, but Cloud Archive failed. Please check network.");
       router.replace('/(tabs)');
     } finally {
       setIsSyncing(false);

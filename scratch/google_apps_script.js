@@ -84,7 +84,7 @@ function doPost(e) {
     // 2. PDF Management (Generates Link)
     let pdfUrl = "N/A";
     if (payload.pdfBase64) {
-      pdfUrl = archivePdfReport(payload.pdfBase64, storeName + "_" + storeCode + "_" + Date.now() + ".pdf");
+      pdfUrl = archivePdfReport(payload.pdfBase64, storeName + "_" + storeCode + "_" + Date.now() + ".pdf", storeName);
     }
     
     // 3. Tab & Column Auto-Healing
@@ -136,11 +136,27 @@ function doPost(e) {
   }
 }
 
-function archivePdfReport(base64, name) {
-  let folder = getFileByName(PDF_FOLDER_NAME, "folder") || DriveApp.createFolder(PDF_FOLDER_NAME);
+const MASTER_ARCHIVE_FOLDER = "RETAIL_AUDIT_DOCUMENTS";
+
+function archivePdfReport(base64, name, storeName) {
+  // 1. Get or Create Master Folder
+  let masterFolder = getFileByName(MASTER_ARCHIVE_FOLDER, "folder") || DriveApp.createFolder(MASTER_ARCHIVE_FOLDER);
+  
+  // 2. Get or Create Store Sub-folder
+  const subFolderName = storeName || "General Reports";
+  let storeFolder;
+  const folders = masterFolder.getFoldersByName(subFolderName);
+  if (folders.hasNext()) {
+    storeFolder = folders.next();
+  } else {
+    storeFolder = masterFolder.createFolder(subFolderName);
+  }
+  
+  // 3. Create File
   const bytes = Utilities.base64Decode(base64);
   const blob = Utilities.newBlob(bytes, MimeType.PDF, name);
-  const file = folder.createFile(blob);
+  const file = storeFolder.createFile(blob);
+  
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   return file.getUrl();
 }

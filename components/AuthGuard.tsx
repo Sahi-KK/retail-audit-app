@@ -8,17 +8,34 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [name, setName] = useState(auth.auditorName || '');
   const [id, setId] = useState(auth.auditorId || '');
 
-  // If already logged in, just show the app
+  // AUTHORIZED LIST
+  const validateAccess = (n: string, i: string) => {
+    const trimmedName = (n || "").trim();
+    const trimmedId = (i || "").trim().toUpperCase();
+    return (trimmedName === "Krishnakant Singh" && trimmedId === "KK13") ||
+           (trimmedName === "Ridhima" && trimmedId === "RR11");
+  };
+
+  // If already logged in, double-check the authorization
   if (auth.auditorId && auth.auditorName) {
-    return <>{children}</>;
+    if (validateAccess(auth.auditorName, auth.auditorId)) {
+      return <>{children}</>;
+    } else {
+      // CLEAR UNAUTHORIZED SESSION IMMEDIATELY
+      updateAuth('', '');
+    }
   }
 
   const handleSignIn = () => {
-    if (!name.trim() || !id.trim()) {
-      Alert.alert("Required Info", "Please provide your Full Name and Employee ID to continue.");
-      return;
+    if (validateAccess(name, id)) {
+      updateAuth(name.trim(), id.trim().toUpperCase());
+    } else {
+      Alert.alert(
+        "Access Denied", 
+        "This identity is not recognized in the Strategic Hub registry. Please contact the administrator.",
+        [{ text: "Retry" }]
+      );
     }
-    updateAuth(name.trim(), id.trim());
   };
 
   return (
