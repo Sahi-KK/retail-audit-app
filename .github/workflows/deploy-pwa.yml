@@ -1,4 +1,4 @@
-name: Ghost Pulse: Unified Web Deployment (PWA)
+name: "Ghost Pulse: Unified Web Deployment (PWA)"
 
 on:
   push:
