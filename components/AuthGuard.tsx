@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { useAuditStore } from '../store/auditStore';
 import { User, ShieldCheck, ArrowRight, ClipboardCheck } from 'lucide-react-native';
 
@@ -19,15 +19,23 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return isKK || isRidhima;
   };
 
+  // If already logged in, double-check the authorization
+  if (auth.auditorId && auth.auditorName) {
+    if (validateAccess(auth.auditorName, auth.auditorId)) {
+      return <>{children}</>;
+    } else {
+      // CLEAR UNAUTHORIZED SESSION
+      updateAuth('', '');
+    }
+  }
+
   const notify = (title: string, message: string) => {
     if (Platform.OS === 'web') {
-      console.log(`[AUTH] ${title}: ${message}`);
-      // Fallback for critical errors only to avoid intrusive pops
-      if (title.includes("Denied")) {
-         alert(`${title}\n\n${message}`);
-      }
+      console.warn(`[AUTH] ${title}: ${message}`);
+      alert(`${title}\n\n${message}`);
     } else {
-      Alert.alert(title, message, [{ text: "Retry" }]);
+      // Native fallback
+      console.log(`${title}: ${message}`);
     }
   };
 
@@ -37,7 +45,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       console.log("[AUTH] Identity Verified. Opening Hub...");
       updateAuth(name.trim(), id.trim().toUpperCase());
     } else {
-      console.warn("[AUTH] Identity Rejected.");
       notify(
         "Access Denied", 
         "This identity is not recognized in the Strategic Hub registry. Please contact the administrator."
