@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useAuditStore } from '../store/auditStore';
-import { User, ShieldCheck, ArrowRight, ClipboardCheck, Globe } from 'lucide-react-native';
-import { useGoogleAuth } from '../services/authService';
+import { User, ShieldCheck, ArrowRight, ClipboardCheck } from 'lucide-react-native';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { auth, updateAuth } = useAuditStore();
-  const { signIn, isLoading: isGoogleLoading } = useGoogleAuth();
-  const [name, setName] = useState('');
-  const [id, setId] = useState('');
+  const [name, setName] = useState(auth.auditorName || '');
+  const [id, setId] = useState(auth.auditorId || '');
 
   // If already logged in, just show the app
   if (auth.auditorId && auth.auditorName) {
@@ -17,7 +15,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   const handleSignIn = () => {
     if (!name.trim() || !id.trim()) {
-      Alert.alert("Required Info", "Please provide your Name and unique Auditor ID to continue.");
+      Alert.alert("Required Info", "Please provide your Full Name and Employee ID to continue.");
       return;
     }
     updateAuth(name.trim(), id.trim());
@@ -40,29 +38,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
         {/* Form Section */}
         <View className="bg-white/5 p-8 rounded-[40px] border border-white/10 shadow-2xl">
-          <Text className="text-white/40 text-xs font-bold uppercase tracking-widest mb-6 text-center">Identity Badge Required</Text>
+          <Text className="text-white/40 text-xs font-bold uppercase tracking-widest mb-6 text-center">Employee Identity Required</Text>
           
-          <Pressable 
-            onPress={() => signIn()}
-            disabled={isGoogleLoading}
-            className="bg-white h-14 rounded-2xl flex-row items-center justify-center mb-6 active:scale-95 border border-slate-200"
-          >
-            {isGoogleLoading ? (
-              <ActivityIndicator color="#0A0F1E" />
-            ) : (
-              <>
-                <Globe size={18} color="#0A0F1E" strokeWidth={3} />
-                <Text className="text-[#0A0F1E] font-black text-xs uppercase tracking-widest ml-3">Verify with Google</Text>
-              </>
-            )}
-          </Pressable>
-
-          <View className="flex-row items-center mb-8 px-4">
-            <View className="flex-1 h-[1px] bg-white/10" />
-            <Text className="text-white/20 text-[9px] font-black uppercase tracking-widest mx-4">OR MANUAL ENTRY</Text>
-            <View className="flex-1 h-[1px] bg-white/10" />
-          </View>
-
           <View className="mb-6">
             <View className="flex-row items-center mb-2 ml-1">
               <User size={14} color="#C9A84C" />
@@ -80,12 +57,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           <View className="mb-8">
             <View className="flex-row items-center mb-2 ml-1">
               <ShieldCheck size={14} color="#C9A84C" />
-              <Text className="text-slate-400 text-[10px] font-black uppercase tracking-wider ml-2">Auditor ID</Text>
+              <Text className="text-slate-400 text-[10px] font-black uppercase tracking-wider ml-2">Employee ID</Text>
             </View>
             <TextInput
               value={id}
               onChangeText={setId}
-              placeholder="e.g. LUX-8836"
+              placeholder="e.g. EMP-9921"
               placeholderTextColor="#64748B"
               autoCapitalize="characters"
               className="bg-white/10 h-14 rounded-2xl px-5 text-white font-bold border border-white/5"
@@ -96,13 +73,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
             onPress={handleSignIn}
             className="bg-[#C9A84C] h-16 rounded-2xl flex-row items-center justify-center shadow-lg active:scale-95"
           >
-            <Text className="text-[#0A0F1E] font-black text-lg mr-3">INITIALIZE</Text>
+            <Text className="text-[#0A0F1E] font-black text-lg mr-3">ACCESS HUB</Text>
             <ArrowRight size={20} color="#0A0F1E" strokeWidth={3} />
           </Pressable>
         </View>
 
-        <Text className="text-[#C9A84C]/20 text-center text-[8px] font-black uppercase tracking-[2px] mt-20">
-          Enterprise v2.1.0 • GHOST CORE • Cloud Master
+        <Text className="text-[#C9A84C]/20 text-center text-[8px] font-black uppercase tracking-[2px] mt-24">
+          Enterprise v2.3.0 • GHOST STABLE • Sync Active
         </Text>
       </View>
     </KeyboardAvoidingView>

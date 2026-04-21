@@ -50,7 +50,7 @@ export default function HomeDashboard() {
       setHeaderField('storeBrand', store.brand);
       setHeaderField('isCustomStore', !!customStores.find(s => s.code === store.code));
     }
-    router.push('/(audit)/new-audit');
+    router.push('/new-audit' as any);
   };
 
   return (
