@@ -12,28 +12,35 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const validateAccess = (n: string, i: string) => {
     const trimmedName = (n || "").trim();
     const trimmedId = (i || "").trim().toUpperCase();
-    return (trimmedName === "Krishnakant Singh" && trimmedId === "KK13") ||
-           (trimmedName === "Ridhima" && trimmedId === "RR11");
+    
+    const isKK = trimmedName === "Krishnakant Singh" && trimmedId === "KK13";
+    const isRidhima = trimmedName === "Ridhima" && trimmedId === "RR11";
+    
+    return isKK || isRidhima;
   };
 
-  // If already logged in, double-check the authorization
-  if (auth.auditorId && auth.auditorName) {
-    if (validateAccess(auth.auditorName, auth.auditorId)) {
-      return <>{children}</>;
+  const notify = (title: string, message: string) => {
+    if (Platform.OS === 'web') {
+      console.log(`[AUTH] ${title}: ${message}`);
+      // Fallback for critical errors only to avoid intrusive pops
+      if (title.includes("Denied")) {
+         alert(`${title}\n\n${message}`);
+      }
     } else {
-      // CLEAR UNAUTHORIZED SESSION IMMEDIATELY
-      updateAuth('', '');
+      Alert.alert(title, message, [{ text: "Retry" }]);
     }
-  }
+  };
 
   const handleSignIn = () => {
+    console.log(`[AUTH] Attempting access: Name="${name}", ID="${id}"`);
     if (validateAccess(name, id)) {
+      console.log("[AUTH] Identity Verified. Opening Hub...");
       updateAuth(name.trim(), id.trim().toUpperCase());
     } else {
-      Alert.alert(
+      console.warn("[AUTH] Identity Rejected.");
+      notify(
         "Access Denied", 
-        "This identity is not recognized in the Strategic Hub registry. Please contact the administrator.",
-        [{ text: "Retry" }]
+        "This identity is not recognized in the Strategic Hub registry. Please contact the administrator."
       );
     }
   };
