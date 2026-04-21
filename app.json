@@ -40,8 +40,7 @@
       "themeColor": "#C9A84C",
       "display": "standalone",
       "orientation": "portrait",
-      "lang": "en-IN",
-      "baseUrl": "/retail-audit-app"
+      "lang": "en-IN"
     },
     "plugins": [
       [
@@ -74,7 +73,8 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": true,
+      "baseUrl": "/retail-audit-app"
     },
     "extra": {
       "router": {},
