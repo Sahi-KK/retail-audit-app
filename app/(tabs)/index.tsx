@@ -1,18 +1,20 @@
 import React from 'react';
 import { View, Text, ScrollView, Dimensions, Modal, Pressable } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
-import { TrendingUp, Crown, AlertTriangle, ChevronDown, CheckCircle2, AlertCircle, X } from 'lucide-react-native';
+import { TrendingUp, Crown, AlertTriangle, ChevronDown, CheckCircle2, AlertCircle, X, ClipboardCheck, ArrowRight } from 'lucide-react-native';
 import { useScoreCalc } from '../../hooks/useScoreCalc';
 import { useCriticalIssues } from '../../hooks/useCriticalIssues';
 import { useAuditStore } from '../../store/auditStore';
 import { locationData } from '../../data/locationData';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
 
 export default function HomeDashboard() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { fleetStats, getRankedStores, getChartData, fleetCategoryStats, getStoreStats } = useScoreCalc();
-  const { customStores } = useAuditStore();
+  const { customStores, setHeaderField, startNewAudit } = useAuditStore();
   const { allStores, topPerformers, actionRequired } = getRankedStores();
   const chartData = getChartData();
 
@@ -39,6 +41,18 @@ export default function HomeDashboard() {
     ? 'All Bengaluru Stores' 
     : bengaluruStores.find(s => s.code === selectedStoreCode)?.name.split(',')[0] || 'Selected Store';
 
+  const handleLaunchAudit = (store?: any) => {
+    setPickerVisible(false);
+    startNewAudit();
+    if (store) {
+      setHeaderField('store', store.name);
+      setHeaderField('storeCode', store.code);
+      setHeaderField('storeBrand', store.brand);
+      setHeaderField('isCustomStore', !!customStores.find(s => s.code === store.code));
+    }
+    router.push('/(audit)/new-audit');
+  };
+
   return (
     <ScrollView 
       className="flex-1 bg-slate-50" 
@@ -52,6 +66,12 @@ export default function HomeDashboard() {
             <Text className="text-slate-400 text-[10px] font-medium uppercase tracking-[4px] mb-2">Regional Intelligence</Text>
             <Text className="text-white text-4xl font-semibold tracking-tighter">Strategic Hub</Text>
           </View>
+          <Pressable 
+            onPress={() => handleLaunchAudit()}
+            className="bg-[#C9A84C] p-4 rounded-2xl shadow-lg active:scale-95"
+          >
+            <ClipboardCheck size={24} color="#0A0F1E" strokeWidth={2.5} />
+          </Pressable>
         </View>
 
         {/* Global Filter Pill (Relocated to Header) */}
@@ -259,8 +279,8 @@ export default function HomeDashboard() {
 
       {/* Store Picker Modal */}
       <Modal visible={pickerVisible} animationType="fade" transparent>
-        <View className="flex-1 bg-black/60 justify-center px-10">
-          <View className="bg-white rounded-[40px] max-h-[70%] overflow-hidden">
+        <View className="flex-1 bg-black/60 justify-center px-6">
+          <View className="bg-white rounded-[40px] max-h-[80%] overflow-hidden">
             <View className="flex-row justify-between items-center px-8 py-6 border-b border-slate-50">
               <Text className="text-slate-900 font-black text-xl tracking-tight">Scope Selection</Text>
               <Pressable onPress={() => setPickerVisible(false)} className="bg-slate-50 p-2.5 rounded-xl">
@@ -270,25 +290,38 @@ export default function HomeDashboard() {
             <ScrollView className="px-4 py-4" showsVerticalScrollIndicator={false}>
               <Pressable 
                 onPress={() => { setSelectedStoreCode('ALL'); setPickerVisible(false); }}
-                className={`p-4 rounded-2xl mb-2 ${selectedStoreCode === 'ALL' ? 'bg-slate-900' : 'bg-slate-50'}`}
+                className={`p-6 rounded-3xl mb-4 ${selectedStoreCode === 'ALL' ? 'bg-slate-900 shadow-lg' : 'bg-slate-50'}`}
               >
                 <Text className={`font-black text-xs uppercase tracking-widest ${selectedStoreCode === 'ALL' ? 'text-white' : 'text-slate-500'}`}>
                    All Bengaluru Stores
                 </Text>
               </Pressable>
+              
+              <View className="mt-2 mb-4 px-2">
+                <Text className="text-slate-400 text-[9px] font-black uppercase tracking-widest">Active Store Registry</Text>
+              </View>
+
               {bengaluruStores.map(store => (
-                <Pressable 
-                  key={store.code}
-                  onPress={() => { setSelectedStoreCode(store.code); setPickerVisible(false); }}
-                  className={`p-4 rounded-2xl mb-2 ${selectedStoreCode === store.code ? 'bg-slate-900' : 'bg-slate-50'}`}
-                >
-                  <Text className={`font-black text-xs uppercase tracking-widest ${selectedStoreCode === store.code ? 'text-white' : 'text-slate-500'}`}>
-                    {store.name.split(',')[0]}
-                  </Text>
-                  <Text className={`text-[8px] font-bold uppercase tracking-[2px] mt-1 ${selectedStoreCode === store.code ? 'text-white/40' : 'text-slate-300'}`}>
-                    {store.code}
-                  </Text>
-                </Pressable>
+                <View key={store.code} className={`p-4 rounded-3xl mb-3 flex-row items-center justify-between ${selectedStoreCode === store.code ? 'bg-slate-100 border border-slate-200' : 'bg-slate-50'}`}>
+                  <Pressable 
+                    onPress={() => { setSelectedStoreCode(store.code); setPickerVisible(false); }}
+                    className="flex-1"
+                  >
+                    <Text className="font-black text-xs uppercase tracking-widest text-slate-900">
+                      {store.name.split(',')[0]}
+                    </Text>
+                    <Text className="text-[8px] font-bold uppercase tracking-[2px] mt-1 text-slate-400">
+                      {store.code}
+                    </Text>
+                  </Pressable>
+                  
+                  <Pressable 
+                    onPress={() => handleLaunchAudit(store)}
+                    className="bg-gold p-3 rounded-2xl shadow-sm active:scale-95"
+                  >
+                    <ArrowRight size={16} color="#0A0F1E" strokeWidth={3} />
+                  </Pressable>
+                </View>
               ))}
             </ScrollView>
           </View>
