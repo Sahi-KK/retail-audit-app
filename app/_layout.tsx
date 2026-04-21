@@ -43,7 +43,7 @@ function UpdateGuard({ children }: { children: React.ReactNode }) {
       }
     }
 
-    if (!__DEV__) {
+    if (!__DEV__ && Platform.OS !== 'web') {
       onFetchUpdateAsync();
     } else {
       setIsChecking(false);
