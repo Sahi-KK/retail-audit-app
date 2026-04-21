@@ -8,11 +8,13 @@ on:
       - 'eas.json'
       - '.github/workflows/android-build.yml'
       - 'assets/images/**'
-  workflow_dispatch: # Allows manual build triggers
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: 🏗 Checkout Repo
         uses: actions/checkout@v4
@@ -20,7 +22,7 @@ jobs:
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: ☕ Setup Java (Android Native tools)
@@ -41,7 +43,5 @@ jobs:
 
       - name: 🔨 Build Standalone APK (Expo Cloud)
         # We switch to cloud build for the first run to handle automatic Keystore generation
-        run: npx eas-cli build --platform android --profile preview --non-interactive --no-verify
-
-      # Note: Cloud builds provide the URL in the logs.
-      # You can also use 'eas build:list' to see them.
+        # We resume normal verification now that dependencies are synchronized
+        run: npx eas-cli build --platform android --profile preview --non-interactive
