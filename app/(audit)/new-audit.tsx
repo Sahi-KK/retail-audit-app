@@ -52,13 +52,15 @@ export default function NewAuditScreen() {
 
   const currentCategoryQuestions = AUDIT_QUESTIONS.filter(q => q.category === activeCategory);
   
+  const [isSyncing, setIsSyncing] = useState(false);
+
   const stats = useMemo(() => {
     let earned = 0;
     let total = 0;
     
     AUDIT_QUESTIONS.forEach(q => {
       const score = scores[q.id] || 0;
-      earned += (score / 10) * q.weight; // Normalize to 0-weight
+      earned += (score / 10) * q.weight;
       total += q.weight;
     });
 
@@ -87,15 +89,48 @@ export default function NewAuditScreen() {
     }
   };
 
-  const finalizeSubmission() {
-    submitAudit({
-      percentage: stats.percentage,
-      earned: stats.earned,
-      total: stats.total
-    });
-    Alert.alert("Success", "Audit submitted and synced to cloud.");
-    router.replace('/(tabs)');
-  }
+  const finalizeSubmission = async () => {
+    const auditData = {
+      id: Date.now().toString(),
+      auditor: headerInfo.auditorName,
+      auditorId: headerInfo.auditorId,
+      store: headerInfo.store,
+      storeCode: headerInfo.storeCode,
+      brand: headerInfo.storeBrand,
+      score: stats.percentage,
+      details: scores,
+      timestamp: new Date().toISOString()
+    };
+
+    setIsSyncing(true);
+    try {
+      const { googleSheetsService } = require('../../services/googleSheets');
+      const result = await googleSheetsService.syncAudit(auditData);
+      
+      if (result.status === 'success') {
+        submitAudit({
+          percentage: stats.percentage,
+          earned: stats.earned,
+          total: stats.total
+        });
+        Alert.alert("Success", "Audit submitted and synced to Cloud Hub.");
+        router.replace('/(tabs)');
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      // Fallback: Save locally even if sync fails
+      submitAudit({
+        percentage: stats.percentage,
+        earned: stats.earned,
+        total: stats.total
+      });
+      Alert.alert("Partial Success", "Audit saved locally, but Cloud Sync failed. Please check network.");
+      router.replace('/(tabs)');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const handleReset = () => {
     Alert.alert(

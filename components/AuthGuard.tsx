@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
 import { useAuditStore } from '../store/auditStore';
-import { User, ShieldCheck, ArrowRight, ClipboardCheck } from 'lucide-react-native';
+import { User, ShieldCheck, ArrowRight, ClipboardCheck, Globe } from 'lucide-react-native';
+import { useGoogleAuth } from '../services/authService';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { auth, updateAuth } = useAuditStore();
+  const { signIn, isLoading: isGoogleLoading } = useGoogleAuth();
   const [name, setName] = useState('');
   const [id, setId] = useState('');
 
@@ -40,6 +42,27 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         <View className="bg-white/5 p-8 rounded-[40px] border border-white/10 shadow-2xl">
           <Text className="text-white/40 text-xs font-bold uppercase tracking-widest mb-6 text-center">Identity Badge Required</Text>
           
+          <Pressable 
+            onPress={() => signIn()}
+            disabled={isGoogleLoading}
+            className="bg-white h-14 rounded-2xl flex-row items-center justify-center mb-6 active:scale-95 border border-slate-200"
+          >
+            {isGoogleLoading ? (
+              <ActivityIndicator color="#0A0F1E" />
+            ) : (
+              <>
+                <Globe size={18} color="#0A0F1E" strokeWidth={3} />
+                <Text className="text-[#0A0F1E] font-black text-xs uppercase tracking-widest ml-3">Verify with Google</Text>
+              </>
+            )}
+          </Pressable>
+
+          <View className="flex-row items-center mb-8 px-4">
+            <View className="flex-1 h-[1px] bg-white/10" />
+            <Text className="text-white/20 text-[9px] font-black uppercase tracking-widest mx-4">OR MANUAL ENTRY</Text>
+            <View className="flex-1 h-[1px] bg-white/10" />
+          </View>
+
           <View className="mb-6">
             <View className="flex-row items-center mb-2 ml-1">
               <User size={14} color="#C9A84C" />
@@ -57,7 +80,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           <View className="mb-8">
             <View className="flex-row items-center mb-2 ml-1">
               <ShieldCheck size={14} color="#C9A84C" />
-              <Text className="text-slate-400 text-[10px] font-black uppercase tracking-wider ml-2">Login ID / Auditor ID</Text>
+              <Text className="text-slate-400 text-[10px] font-black uppercase tracking-wider ml-2">Auditor ID</Text>
             </View>
             <TextInput
               value={id}
@@ -73,17 +96,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
             onPress={handleSignIn}
             className="bg-[#C9A84C] h-16 rounded-2xl flex-row items-center justify-center shadow-lg active:scale-95"
           >
-            <Text className="text-[#0A0F1E] font-black text-lg mr-3">INITIALIZE IDENTITY</Text>
+            <Text className="text-[#0A0F1E] font-black text-lg mr-3">INITIALIZE</Text>
             <ArrowRight size={20} color="#0A0F1E" strokeWidth={3} />
           </Pressable>
         </View>
 
-        <Text className="text-slate-500 text-center text-[10px] font-medium leading-relaxed mt-10 px-6">
-          This identity is used to secure your cloud reports and ensure all audit scores are correctly attributed to you in the official database.
-        </Text>
-
-        <Text className="text-[#C9A84C]/20 text-center text-[8px] font-black uppercase tracking-[2px] mt-8">
-          Enterprise v1.4.0 • GHOST STABLE • Secure Sync
+        <Text className="text-[#C9A84C]/20 text-center text-[8px] font-black uppercase tracking-[2px] mt-20">
+          Enterprise v2.1.0 • GHOST CORE • Cloud Master
         </Text>
       </View>
     </KeyboardAvoidingView>
