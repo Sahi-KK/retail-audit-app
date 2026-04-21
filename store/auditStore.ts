@@ -41,8 +41,6 @@ interface AuditStore {
   auth: {
     auditorName: string;
     auditorId: string;
-    isGoogleAuth: boolean;
-    googleEmail: string | null;
   };
   
   // Current Draft / Active Session
@@ -93,8 +91,6 @@ export const useAuditStore = create<AuditStore>()(
       auth: {
         auditorName: '',
         auditorId: '',
-        isGoogleAuth: false,
-        googleEmail: null,
       },
       activeAuditId: null,
       headerInfo: DEFAULT_HEADER,
@@ -104,14 +100,9 @@ export const useAuditStore = create<AuditStore>()(
       customStores: [],
       isReadOnly: false,
       
-      updateAuth: (name, id, isGoogle = false, email = null) => {
+      updateAuth: (name, id) => {
         set((state) => ({
-          auth: { 
-            auditorName: name, 
-            auditorId: id, 
-            isGoogleAuth: isGoogle, 
-            googleEmail: email 
-          },
+          auth: { auditorName: name, auditorId: id },
           headerInfo: { ...state.headerInfo, auditorName: name, auditorId: id }
         }));
       },
