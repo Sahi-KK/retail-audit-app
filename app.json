@@ -36,8 +36,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-auth-session",
-      "expo-crypto",
       [
         "expo-dev-client",
         {
