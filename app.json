@@ -33,7 +33,15 @@
     "runtimeVersion": "1.0.0",
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro",
+      "description": "EssilorLuxottica Strategic Audit Platform",
+      "backgroundColor": "#0A0F1E",
+      "themeColor": "#C9A84C",
+      "display": "standalone",
+      "orientation": "portrait",
+      "lang": "en-IN",
+      "baseUrl": "/retail-audit-app"
     },
     "plugins": [
       [
