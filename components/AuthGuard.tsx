@@ -115,6 +115,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           Enterprise v2.3.0 • GHOST STABLE • Sync Active
         </Text>
       </View>
-    </KeyboardAvoidingView>
+    </Container>
   );
 }
