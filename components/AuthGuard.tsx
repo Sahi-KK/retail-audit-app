@@ -52,9 +52,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const Container = Platform.OS === 'web' ? View : KeyboardAvoidingView;
+
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <Container 
+      {...(Platform.OS !== 'web' ? { behavior: Platform.OS === 'ios' ? 'padding' : 'height' } : {})}
       className="flex-1 bg-[#0A0F1E]"
     >
       <View className="flex-1 px-8 justify-center">
