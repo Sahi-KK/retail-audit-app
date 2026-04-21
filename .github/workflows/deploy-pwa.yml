@@ -23,7 +23,9 @@ jobs:
         run: npm install
 
       - name: 🛠️ Build PWA Core
-        run: npx expo export --platform web --output-dir dist
+        run: |
+          npx expo export --platform web --output-dir dist
+          touch dist/.nojekyll
 
       - name: 🚀 Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
