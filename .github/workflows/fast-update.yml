@@ -48,5 +48,5 @@ jobs:
       - name: ⚡ Publish Ghost Pulse (OTA Update)
         # This ensures the channel is linked to the branch and then publishes the update
         run: |
-          npx eas-cli channel:edit production --branch production --non-interactive
-          npx eas-cli update --branch production --message "Ghost Pulse: Automated Operative Update" --non-interactive
+          eas channel:edit production --branch production --non-interactive
+          eas update --branch production --message "Ghost Pulse: Automated Operative Update" --non-interactive

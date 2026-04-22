@@ -44,4 +44,4 @@ jobs:
       - name: 🔨 Build Standalone APK (Expo Cloud)
         # We switch to cloud build for the first run to handle automatic Keystore generation
         # We resume normal verification now that dependencies are synchronized
-        run: npx eas-cli build --platform android --profile preview --non-interactive
+        run: eas build --platform android --profile preview --non-interactive
