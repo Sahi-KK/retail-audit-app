@@ -4,9 +4,10 @@ import { auditQuestions, AuditCategory } from '../data/auditQuestions';
 import { locationData } from '../data/locationData';
 
 export function useScoreCalc() {
+  const scores = useAuditStore((state) => state.scores || {});
   const storeBrand = useAuditStore((state) => state.headerInfo?.storeBrand || 'Sunglass Hut');
   const isReadOnly = useAuditStore((state) => state.isReadOnly);
-  const completedAudits = useAuditStore((state) => state.completedAudits);
+  const completedAudits = useAuditStore((state) => state.completedAudits || []);
   const customStores = useAuditStore((state) => state.customStores || []);
 
   const currentStats = useMemo(() => {
@@ -50,7 +51,7 @@ export function useScoreCalc() {
         if (cat === 'clinical' && audit?.headerInfo?.storeBrand !== 'LensCrafters') return;
 
         auditQuestions.filter(q => q.category === cat).forEach(q => {
-          earned += audit.scores[q.id] || 0;
+          earned += audit.scores?.[q.id] || 0;
           max += q.maxScore || 5;
         });
       });
@@ -67,8 +68,8 @@ export function useScoreCalc() {
   const fleetCategoryStats = useMemo(() => calculateCategoryStats(completedAudits), [completedAudits]);
 
   const fleetStats = useMemo(() => {
-    if (completedAudits.length === 0) return { avgScore: 0, totalAudits: 0 };
-    const totalPercentage = completedAudits.reduce((acc, curr) => acc + curr.finalPercentage, 0);
+    if (!completedAudits || completedAudits.length === 0) return { avgScore: 0, totalAudits: 0 };
+    const totalPercentage = completedAudits.reduce((acc, curr) => acc + (curr.finalPercentage || 0), 0);
     return {
       avgScore: Math.round(totalPercentage / completedAudits.length),
       totalAudits: completedAudits.length,
@@ -76,13 +77,13 @@ export function useScoreCalc() {
   }, [completedAudits]);
 
   const getStoreStats = (storeCode: string) => {
-    const storeAudits = completedAudits.filter(a => a.headerInfo.storeCode === storeCode);
+    const storeAudits = completedAudits.filter(a => a.headerInfo?.storeCode === storeCode);
     const avgScore = storeAudits.length > 0 
-      ? Math.round(storeAudits.reduce((acc, curr) => acc + curr.finalPercentage, 0) / storeAudits.length)
+      ? Math.round(storeAudits.reduce((acc, curr) => acc + (curr.finalPercentage || 0), 0) / storeAudits.length)
       : null;
     
     const negativeEvidence = storeAudits.flatMap(a => 
-      a.photos.filter(p => p.tag === 'negative')
+      (a.photos || []).filter(p => p.tag === 'negative')
     ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     const categoryStats = calculateCategoryStats(storeAudits);
@@ -98,10 +99,10 @@ export function useScoreCalc() {
   };
 
   const getRankedStores = () => {
-    const defaultStores = locationData["Karnataka"]["Bengaluru"];
+    const defaultStores = locationData["Karnataka"]?.["Bengaluru"] || [];
     const allLocations = [
-      ...customStores,
-      ...defaultStores.filter(s => s.code !== 'CUSTOM')
+      ...(customStores || []),
+      ...defaultStores.filter(s => s && s.code !== 'CUSTOM')
     ];
     
     const storePerformance = allLocations.map(s => {
@@ -121,17 +122,21 @@ export function useScoreCalc() {
   };
 
   const getChartData = () => {
-    const defaultStores = locationData["Karnataka"]["Bengaluru"];
+    const defaultStores = locationData["Karnataka"]?.["Bengaluru"] || [];
     const allLocations = [
-      ...customStores,
-      ...defaultStores.filter(s => s.code !== 'CUSTOM')
+      ...(customStores || []),
+      ...defaultStores.filter(s => s && s.code !== 'CUSTOM')
     ];
     
     const labels = allLocations.map(s => {
+      if (!s || !s.code) return 'N/A';
       const parts = s.code.split('/');
       return parts.length > 1 ? parts[1].trim() : s.code.substring(0, 4);
     });
-    const data = allLocations.map(s => Math.round(getStoreStats(s.code).avgScore || 0));
+    const data = allLocations.map(s => {
+      if (!s || !s.code) return 0;
+      return Math.round(getStoreStats(s.code).avgScore || 0);
+    });
     
     return {
       labels,
@@ -140,7 +145,10 @@ export function useScoreCalc() {
   };
 
   return {
-    ...currentStats,
+    earnedScore: currentStats.earnedScore,
+    totalMaxScore: currentStats.totalMaxScore,
+    percentage: currentStats.percentage,
+    categoryScores: currentStats.categoryScores,
     isReadOnly,
     fleetStats,
     fleetCategoryStats,
