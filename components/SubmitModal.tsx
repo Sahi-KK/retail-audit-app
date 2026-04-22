@@ -229,7 +229,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
         setPdfTooLarge(true);
       }
       
-      const syncResult = await googleSheetsService.syncAudit(syncPayload);
+      const syncResult = await googleSheetsService.syncAudit(syncPayload.auditData, syncPayload.pdfBase64 as string);
       setIsSyncing(false);
       
       if (syncResult.status === 'success') {
