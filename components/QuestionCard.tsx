@@ -44,6 +44,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
             score={score} 
             onChange={(newScore) => setScore(question.id, newScore)} 
             disabled={isReadOnly}
+            isBinary={question.text.includes('Scoring: 0 for No, 5 for Yes')}
           />
         </View>
       </View>

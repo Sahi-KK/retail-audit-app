@@ -48,7 +48,7 @@ export const auditQuestions: AuditQuestion[] = [
   {
     id: 'c7',
     category: 'cleanliness',
-    text: 'Fixture & Wall Maintenance: Are all physical assets (wall bays, tables, styling trays) structurally intact and free of chipped paint, broken hinges, scratched glass, or peeling laminate?',
+    text: 'Fixture & Asset Maintenance: Are all physical assets (Capacity, Lit Gogos, tables, styling trays) structurally intact and free of chipped paint, broken hinges, scratched glass, or peeling laminate?',
     maxScore: 5
   },
   {
@@ -62,49 +62,43 @@ export const auditQuestions: AuditQuestion[] = [
   {
     id: 'm1',
     category: 'merchandising',
-    text: 'Window & Primary Campaign Currency: Is the primary storefront window and center table featuring the globally mandated campaign for the current month, with zero expired marketing visible?',
+    text: 'Primary Front Store & Campaign: Is the primary front store window and Celebration Table (displaying alternative articles) featuring the mandated Tone of Voice Campaign, with zero expired marketing visible?',
     maxScore: 5
   },
   {
     id: 'm2',
     category: 'merchandising',
-    text: 'The Strike Zone & Anchor Placement: Are the highest-volume anchor brands positioned strictly in the designated eye-level "Strike Zone" (Rows 6, 7, and 8)?',
-    maxScore: 5
-  },
-  {
-    id: 'm3',
-    category: 'merchandising',
-    text: 'Brand Segregation: Are fashion/luxury frames distinctly separated from active/performance frames with clear visual breaks to prevent brand dilution?',
+    text: 'Key Equity Placements & NPIs: Are the highest-volume anchor brands and New Product Introductions (NPIs) positioned strictly in the designated eye-level zones?',
     maxScore: 5
   },
   {
     id: 'm4',
     category: 'merchandising',
-    text: 'Price Tag Concealment: Are 100% of the frame price tags neatly tucked behind the temples to ensure a pristine visual presentation?',
+    text: 'Price Tags Compliance: Are all frame price tags present and correctly positioned? (Scoring: 0 for No/Missing, 5 for Yes/Perfect)',
     maxScore: 5
   },
   {
     id: 'm5',
     category: 'merchandising',
-    text: 'Glorifier Alignment: Do the physical frames placed on acrylic glorifiers exactly match the specific model featured in the marketing graphic positioned directly behind them?',
+    text: 'VM Mapping: Do the physical frames placed on acrylic glorifiers exactly match the specific model featured in the VM Mapping graphic positioned behind them?',
     maxScore: 5
   },
   {
     id: 'm6',
     category: 'merchandising',
-    text: 'Planogram Execution: Is the store strictly adhering to the most recently issued corporate planogram across all wall bays and floor fixtures?',
+    text: 'Planogram Execution: Is the store strictly adhering to the most recently issued corporate planogram across all capacity fixtures and floor displays?',
     maxScore: 5
   },
   {
     id: 'm7',
     category: 'merchandising',
-    text: 'Point-of-Purchase (POP) Impulse: Is the cash wrap area strategically utilizing impulse merchandise (cleaning kits, cords) fully stocked and neatly presented?',
+    text: 'Cash Desk Communication: Are the three core communications present (Sunperks Loyalty, Brand Promotion, and Seasonal Promotion)? Is the desk surface clutter-free?',
     maxScore: 5
   },
   {
-    id: 'm8',
+    id: 'm9',
     category: 'merchandising',
-    text: 'Customer Sightline Alignment (10x10 Tool): Is the 10x10 VM graphic tool strategically placed to capture the customer\'s natural entry sightline, with the model\'s gaze directing the customer\'s eyes into the store?',
+    text: 'Format Specific Branding: If Old Format, are all 10x10 tools perfect? If Skin Format, is all brand-specific branding flawless? (Scoring: 0 for No, 5 for Yes)',
     maxScore: 5
   },
 
@@ -136,19 +130,13 @@ export const auditQuestions: AuditQuestion[] = [
   {
     id: 'o5',
     category: 'operations',
-    text: 'Back-of-House Organization: Is the stockroom strictly organized by brand, gender, and style, allowing fresh pair retrieval within 60 seconds?',
+    text: 'Back-of-House Organization: Is the stockroom organized by brand/style with the Planogram and Key Equity Planning visible and adhered to?',
     maxScore: 5
   },
   {
     id: 'o6',
     category: 'operations',
     text: 'Daily Checklist Compliance: Is the daily store opening/closing checklist visibly completed and signed off by the acting Manager on Duty?',
-    maxScore: 5
-  },
-  {
-    id: 'o7',
-    category: 'operations',
-    text: 'Security Tag Compliance: If applicable, are 100% of the required frames tagged correctly without physically damaging the acetate frames?',
     maxScore: 5
   },
 
@@ -168,7 +156,7 @@ export const auditQuestions: AuditQuestion[] = [
   {
     id: 's3',
     category: 'staff',
-    text: 'Open-Ended Discovery: Does the associate actively bypass passive greetings and use open-ended lifestyle questions to uncover the customer\'s needs?',
+    text: '7 Steps Protocol: Upon walk-in, does the staff immediately inform the customer about free eye checkups and available optical frame collections?',
     maxScore: 5
   },
   {
@@ -180,19 +168,13 @@ export const auditQuestions: AuditQuestion[] = [
   {
     id: 's5',
     category: 'staff',
-    text: 'The Styling Tray Protocol: Is the associate actively using a styling tray to present at least 3 distinct frames, preventing the customer from juggling multiple pairs?',
+    text: 'Styling Tray & Multi-Frame Trial: Is the associate using a styling tray to present at least 3 frames and actively encouraging the customer to try more frames?',
     maxScore: 5
   },
   {
     id: 's6',
     category: 'staff',
     text: 'F.A.B. Value Articulation: Does the staff effectively explain the specific technology/features of the frame or lens (Features, Advantages, Benefits)?',
-    maxScore: 5
-  },
-  {
-    id: 's7',
-    category: 'staff',
-    text: 'Top-Down Price Anchoring: When discussing lenses, does the associate initiate the conversation by anchoring with the premium option first?',
     maxScore: 5
   },
   {
@@ -206,49 +188,43 @@ export const auditQuestions: AuditQuestion[] = [
   {
     id: 'l1',
     category: 'clinical',
-    text: 'Clinical Pre-Test Sanitization: Are the clinical pre-test machines visibly sanitized in front of the patient, with fresh chin-rest paper installed and absolutely no lingering makeup or skin oil from previous exams?',
+    text: 'Clinical Pre-Test Sanitization: Are the clinical pre-test machines visibly sanitized in front of the patient, with fresh chin-rest paper installed?',
     maxScore: 5
   },
   {
     id: 'l2',
     category: 'clinical',
-    text: 'The Clinical Receiving Handoff: Does the retail associate actively step up, receive the doctor\'s handoff warmly, and immediately review the specific lifestyle and lens recommendations?',
+    text: 'The Clinical Receiving Handoff: Does the retail associate actively step up, receive the doctor\'s handoff warmly, and immediately review recommendations?',
     maxScore: 5
   },
   {
     id: 'l3',
     category: 'clinical',
-    text: 'Contact Lens I&R Station: Is the dedicated contact lens training station flawlessly clean, with an immaculate sink, pristine tabletop mirrors, and a fully organized, fully stocked supply of trial lenses and solutions?',
+    text: 'Contact Lens Station: Is the training station clean and stocked? (Simplified clinical requirement for contact lens area)',
     maxScore: 5
   },
   {
     id: 'l4',
     category: 'clinical',
-    text: 'Vision Benefit Transparency: Does the associate clearly explain the patient\'s specific vision insurance allowances (e.g., EyeMed) before beginning the frame styling journey to establish an accurate budget?',
-    maxScore: 5
-  },
-  {
-    id: 'l5',
-    category: 'clinical',
-    text: 'Patient Privacy Protocol: Are staff discussing sensitive prescription details discreetly, ensuring intake forms and medical records are never left unattended on public counters?',
-    maxScore: 5
-  },
-  {
-    id: 'l6',
-    category: 'clinical',
-    text: 'Waiting Area Flow: Is the dedicated clinical waiting area strictly maintained, and are waiting patients (or those waiting for dilation) checked on periodically by staff rather than being ignored?',
+    text: 'Vision Benefit Transparency: Does the associate clearly explain the patient\'s specific vision insurance allowances (e.g., EyeMed) before styling?',
     maxScore: 5
   },
   {
     id: 'l7',
     category: 'clinical',
-    text: 'Exam Lane Presentation: Viewing from the hallway, do the active exam lanes look strictly clinical, meticulously organized, and free of personal staff clutter to reinforce medical authority?',
+    text: 'Exam Lane Presentation: Do the active exam lanes look strictly clinical, meticulously organized, and free of personal staff clutter?',
     maxScore: 5
   },
   {
     id: 'l8',
     category: 'clinical',
-    text: 'Prescription Value Articulation: When interpreting the doctor\'s prescription, does the associate confidently explain the medical necessity behind premium lens tech (e.g., high-index lenses, progressive mapping) rather than acting as a passive order-taker?',
+    text: 'Lens Selling Table: Is the customer being thoroughly explained the lens technologies and benefits at the dedicated selling table?',
+    maxScore: 5
+  },
+  {
+    id: 'l9',
+    category: 'clinical',
+    text: 'Top-Down Price Anchoring: When discussing lenses, does the associate initiate the conversation by anchoring with the premium option first?',
     maxScore: 5
   }
 ];

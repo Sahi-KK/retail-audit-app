@@ -6,14 +6,17 @@ interface ScoreSelectorProps {
   score: number | undefined;
   onChange: (score: number) => void;
   disabled?: boolean;
+  isBinary?: boolean;
 }
 
 const SCORES = [0, 1, 2, 3, 4, 5];
 
-export function ScoreSelector({ score, onChange, disabled }: ScoreSelectorProps) {
+export function ScoreSelector({ score, onChange, disabled, isBinary }: ScoreSelectorProps) {
+  const visibleScores = isBinary ? [0, 5] : SCORES;
+
   return (
     <View className="flex-row justify-between items-center w-full mt-6 bg-slate-100/50 p-1.5 rounded-3xl border border-slate-200/50">
-      {SCORES.map((s) => (
+      {visibleScores.map((s) => (
         <ScorePill
           key={s}
           value={s}
