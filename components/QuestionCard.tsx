@@ -16,21 +16,30 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
   const { isReadOnly } = useScoreCalc();
 
   return (
-    <View className="mb-12 bg-white rounded-[48px] shadow-sm overflow-hidden">
-      <View className="p-10">
-        <View className="flex-row items-start mb-8">
-          <View className="bg-slate-50 w-10 h-10 rounded-2xl items-center justify-center mr-5">
-            <Text className="text-slate-400 font-bold text-xs">{String(index + 1).padStart(2, '0')}</Text>
+    <View className="mb-8 bg-white rounded-[40px] shadow-sm border border-slate-100 overflow-hidden">
+      <View className="p-8">
+        <View className="flex-row justify-between items-center mb-6">
+          <View className="bg-slate-900 px-4 py-1.5 rounded-full">
+            <Text className="text-white text-[9px] font-black uppercase tracking-widest">
+              {question.category}
+            </Text>
           </View>
-          <Text className="flex-1 text-xl text-slate-800 leading-snug font-semibold tracking-tight">
-            {question.text}
-          </Text>
+          <View className="bg-slate-50 w-8 h-8 rounded-xl items-center justify-center">
+            <Text className="text-slate-400 font-black text-[10px]">{String(index + 1).padStart(2, '0')}</Text>
+          </View>
         </View>
+
+        <Text className="text-lg text-slate-800 leading-tight font-bold tracking-tight mb-8">
+          {question.text}
+        </Text>
         
-        <View className="mt-6 pt-10 border-t border-slate-50">
-          <Text className="text-[10px] text-slate-400 font-medium tracking-[3px] uppercase ml-1 mb-4">
-            Clinical Compliance Assessment
-          </Text>
+        <View className="pt-8 border-t border-slate-50">
+          <View className="flex-row items-center mb-4">
+            <View className="w-1.5 h-1.5 rounded-full bg-slate-900 mr-2" />
+            <Text className="text-[9px] text-slate-400 font-black tracking-widest uppercase">
+              Compliance Score
+            </Text>
+          </View>
           <ScoreSelector 
             score={score} 
             onChange={(newScore) => setScore(question.id, newScore)} 

@@ -9,45 +9,54 @@ import { AuditCategory } from '../../data/auditQuestions';
 import { useAuditStore } from '../../store/auditStore';
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
-  const { categoryScores, isReadOnly } = useScoreCalc();
+  const { categoryScores } = useScoreCalc();
 
   return (
-    <View className="flex-row bg-white border-b border-slate-100 shadow-sm">
-      {state.routes.map((route: any, index: number) => {
-        const { options } = descriptors[route.key];
-        const label = options.title !== undefined ? options.title : route.name;
-        const isFocused = state.index === index;
-        
-        let category: AuditCategory = 'cleanliness';
-        if (route.name === 'merchandising') category = 'merchandising';
-        if (route.name === 'operations') category = 'operations';
-        if (route.name === 'staff') category = 'staff';
-        if (route.name === 'clinical') category = 'clinical';
+    <View className="bg-white border-b border-slate-100">
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false} 
+        className="px-4"
+        contentContainerStyle={{ paddingVertical: 12 }}
+      >
+        <View className="flex-row gap-x-3">
+          {state.routes.map((route: any, index: number) => {
+            const { options } = descriptors[route.key];
+            const label = options.title !== undefined ? options.title : route.name;
+            const isFocused = state.index === index;
+            
+            let category: AuditCategory = 'cleanliness';
+            if (route.name === 'merchandising') category = 'merchandising';
+            if (route.name === 'operations') category = 'operations';
+            if (route.name === 'staff') category = 'staff';
+            if (route.name === 'clinical') category = 'clinical';
 
-        const catScore = categoryScores[category];
-        const scoreString = `${catScore.earned}/${catScore.max}`;
+            const catScore = categoryScores[category];
+            const isDone = catScore.earned > 0;
 
-        return (
-          <Pressable
-            key={route.key}
-            onPress={() => navigation.navigate(route.name)}
-            className={`flex-1 py-5 items-center border-b-[3px] ${
-              isFocused ? 'border-slate-900' : 'border-transparent'
-            }`}
-          >
-            <Text className={`text-[10px] font-black uppercase tracking-[2px] ${
-              isFocused ? 'text-slate-900' : 'text-slate-300'
-            }`}>
-              {label}
-            </Text>
-            <View className={`mt-2 px-2.5 py-1 rounded-full ${isFocused ? 'bg-slate-100' : 'bg-slate-50'}`}>
-              <Text className={`text-[9px] font-black ${isFocused ? 'text-slate-900' : 'text-slate-300'}`}>
-                {scoreString}
-              </Text>
-            </View>
-          </Pressable>
-        );
-      })}
+            return (
+              <Pressable
+                key={route.key}
+                onPress={() => navigation.navigate(route.name)}
+                className={`px-6 py-3.5 rounded-2xl flex-row items-center border ${
+                  isFocused 
+                    ? 'bg-slate-900 border-slate-900 shadow-md' 
+                    : 'bg-white border-slate-100'
+                }`}
+              >
+                <Text className={`text-[10px] font-black uppercase tracking-widest ${
+                  isFocused ? 'text-white' : 'text-slate-400'
+                }`}>
+                  {label}
+                </Text>
+                {isDone && (
+                   <View className={`ml-2 w-1.5 h-1.5 rounded-full ${isFocused ? 'bg-emerald-400' : 'bg-emerald-500'}`} />
+                )}
+              </Pressable>
+            );
+          })}
+        </View>
+      </ScrollView>
     </View>
   );
 }

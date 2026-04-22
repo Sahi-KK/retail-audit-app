@@ -8,11 +8,11 @@ interface ScoreSelectorProps {
   disabled?: boolean;
 }
 
-const SCORES = [0, 1, 2, 3, 4, 5];
+const SCORES = [0, 2, 4, 6, 8, 10];
 
 export function ScoreSelector({ score, onChange, disabled }: ScoreSelectorProps) {
   return (
-    <View className="flex-row justify-between items-center w-full mt-5 bg-slate-50 p-2 rounded-full border border-slate-100">
+    <View className="flex-row justify-between items-center w-full mt-6 bg-slate-100/50 p-1.5 rounded-3xl border border-slate-200/50">
       {SCORES.map((s) => (
         <ScorePill
           key={s}
@@ -34,33 +34,45 @@ interface ScorePillProps {
 }
 
 function ScorePill({ value, isSelected, onPress, disabled }: ScorePillProps) {
-  const scale = useSharedValue(1);
-
   const animatedStyle = useAnimatedStyle(() => {
+    const getBgColor = () => {
+      if (!isSelected) return 'transparent';
+      if (value >= 8) return '#10B981'; // Emerald
+      if (value >= 4) return '#F59E0B'; // Amber
+      return '#EF4444'; // Red
+    };
+
     return {
+      backgroundColor: withSpring(getBgColor()),
       transform: [{ scale: withSpring(isSelected ? 1.05 : 1) }],
-      backgroundColor: isSelected ? '#0F172A' : 'transparent', // slate-900
-      shadowOpacity: isSelected ? 0.15 : 0,
-      shadowRadius: 8,
-      shadowOffset: { width: 0, height: 4 },
     };
   });
 
   return (
     <Pressable
-      onPressIn={() => {
-        scale.value = 0.95;
-      }}
-      onPressOut={() => {
+      onPress={() => {
         if (disabled) return;
-        scale.value = 1;
         onPress();
       }}
-      className={`flex-1 items-center justify-center py-2 rounded-full mx-0.5 ${disabled && !isSelected ? 'opacity-30' : ''}`}
+      className={`flex-1 items-center justify-center py-2.5 rounded-2xl mx-1 ${
+        disabled && !isSelected ? 'opacity-30' : ''
+      }`}
     >
-      <Animated.View style={[animatedStyle, { width: '100%', alignItems: 'center', paddingVertical: 12, borderRadius: 9999 }]}>
+      <Animated.View 
+        style={[animatedStyle, { 
+          width: '100%', 
+          alignItems: 'center', 
+          paddingVertical: 14, 
+          borderRadius: 16,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: isSelected ? 0.2 : 0,
+          shadowRadius: 10,
+          elevation: isSelected ? 4 : 0
+        }]}
+      >
         <Text
-          className={`text-lg font-black ${
+          className={`text-base font-black ${
             isSelected ? 'text-white' : 'text-slate-400'
           }`}
         >
