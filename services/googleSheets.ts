@@ -1,5 +1,5 @@
 // REPLACE THIS with your deployed Google Apps Script URL
-const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbxZSRw0ze_WE9sWTBXFpAoyqXaDEnnDnGcOvZI5Flv8B68_rCMQe1onFbPIZ6tkb0_q/exec";
+const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbypy7sK63OxQWqR9RzvZ3xMw47pJukssnIdPlRXad0-3o6wblJ5T7lLv19DCpAeKOuL/exec";
 
 export interface SyncResult {
   status: 'success' | 'error';
