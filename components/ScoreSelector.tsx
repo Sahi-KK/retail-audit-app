@@ -8,7 +8,7 @@ interface ScoreSelectorProps {
   disabled?: boolean;
 }
 
-const SCORES = [0, 2, 4, 6, 8, 10];
+const SCORES = [0, 1, 2, 3, 4, 5];
 
 export function ScoreSelector({ score, onChange, disabled }: ScoreSelectorProps) {
   return (
@@ -37,9 +37,9 @@ function ScorePill({ value, isSelected, onPress, disabled }: ScorePillProps) {
   const animatedStyle = useAnimatedStyle(() => {
     const getBgColor = () => {
       if (!isSelected) return 'transparent';
-      if (value >= 8) return '#10B981'; // Emerald
-      if (value >= 4) return '#F59E0B'; // Amber
-      return '#EF4444'; // Red
+      if (value >= 4) return '#10B981'; // Emerald (Excellent)
+      if (value >= 2) return '#F59E0B'; // Amber (Needs Work)
+      return '#EF4444'; // Red (Critical)
     };
 
     return {
