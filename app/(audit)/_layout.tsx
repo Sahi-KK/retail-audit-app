@@ -22,6 +22,8 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         <View className="flex-row gap-x-3">
           {state.routes.map((route: any, index: number) => {
             const { options } = descriptors[route.key];
+            if (options.href === null) return null;
+            
             const label = options.title !== undefined ? options.title : route.name;
             const isFocused = state.index === index;
             
@@ -96,6 +98,7 @@ export default function AuditLayout() {
           <Tabs.Screen name="operations" options={{ title: 'Ops' }} />
           <Tabs.Screen name="staff" options={{ title: 'Staff' }} />
           <Tabs.Screen name="clinical" options={{ title: 'Clinic' }} />
+          <Tabs.Screen name="new-audit" options={{ href: null }} />
         </Tabs>
       </View>
       
