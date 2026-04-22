@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, Dimensions, Modal, Pressable } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
-import { TrendingUp, Crown, AlertTriangle, ChevronDown, CheckCircle2, AlertCircle, X, ClipboardCheck, ArrowRight } from 'lucide-react-native';
+import { TrendingUp, Crown, AlertTriangle, ChevronDown, CheckCircle2, AlertCircle, X, ClipboardCheck, ArrowRight, Plus } from 'lucide-react-native';
 import { useScoreCalc } from '../../hooks/useScoreCalc';
 import { useCriticalIssues } from '../../hooks/useCriticalIssues';
 import { useAuditStore } from '../../store/auditStore';
@@ -56,11 +56,13 @@ export default function HomeDashboard() {
   return (
     <ScrollView 
       className="flex-1 bg-slate-50" 
-      style={{ paddingTop: insets.top }}
       showsVerticalScrollIndicator={false}
     >
       {/* Header & Stats */}
-      <View className="px-6 pt-6 pb-12 bg-slate-900 rounded-b-[48px] shadow-xl">
+      <View 
+        className="px-6 pb-12 bg-slate-900 rounded-b-[48px] shadow-xl"
+        style={{ paddingTop: insets.top + 24 }}
+      >
         <View className="flex-row justify-between items-center mb-8">
           <View>
             <Text className="text-slate-400 text-[10px] font-medium uppercase tracking-[4px] mb-2">Regional Intelligence</Text>
@@ -70,7 +72,7 @@ export default function HomeDashboard() {
             onPress={() => handleLaunchAudit()}
             className="bg-[#C9A84C] p-4 rounded-2xl shadow-lg active:scale-95"
           >
-            <ClipboardCheck size={24} color="#0A0F1E" strokeWidth={2.5} />
+            <Plus size={24} color="#0A0F1E" strokeWidth={3} />
           </Pressable>
         </View>
 
@@ -136,7 +138,7 @@ export default function HomeDashboard() {
       </View>
 
       {/* Bar Chart Section */}
-      <View className="mx-6 -mt-8 bg-white p-8 rounded-[48px] shadow-sm mb-12">
+      <View className="mx-6 mt-6 bg-white p-8 rounded-[48px] shadow-sm mb-12">
         <View className="flex-row items-center justify-between mb-10 px-2">
           <View>
              <Text className="text-slate-800 font-semibold text-xl tracking-tight">Active Metrics</Text>
