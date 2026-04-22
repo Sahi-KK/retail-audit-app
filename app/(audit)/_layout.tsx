@@ -10,6 +10,8 @@ import { useAuditStore } from '../../store/auditStore';
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const { categoryScores } = useScoreCalc();
+  const storeBrand = useAuditStore((state) => state.headerInfo?.storeBrand || 'Sunglass Hut');
+  const isLensCrafters = storeBrand === 'LensCrafters';
 
   return (
     <View className="bg-white border-b border-slate-100">
@@ -21,6 +23,9 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       >
         <View className="flex-row gap-x-3">
           {state.routes.map((route: any, index: number) => {
+            // Force hide clinical for non-LensCrafters
+            if (route.name === 'clinical' && !isLensCrafters) return null;
+            
             const { options } = descriptors[route.key];
             if (options.href === null) return null;
             
