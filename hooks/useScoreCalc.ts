@@ -4,13 +4,18 @@ import { auditQuestions, AuditCategory } from '../data/auditQuestions';
 import { locationData } from '../data/locationData';
 
 export function useScoreCalc() {
-  const scores = useAuditStore((state) => state.scores);
+  const storeBrand = useAuditStore((state) => state.headerInfo?.storeBrand || 'Sunglass Hut');
   const isReadOnly = useAuditStore((state) => state.isReadOnly);
   const completedAudits = useAuditStore((state) => state.completedAudits);
   const customStores = useAuditStore((state) => state.customStores || []);
 
   const currentStats = useMemo(() => {
-    let totalMaxScore = auditQuestions.length * 5;
+    // Determine which questions are relevant for the current brand
+    const relevantQuestions = auditQuestions.filter(q => 
+      q.category !== 'clinical' || storeBrand === 'LensCrafters'
+    );
+
+    let totalMaxScore = 0;
     let earnedScore = 0;
     
     const categoryScores: Record<AuditCategory, { earned: number, max: number }> = {
@@ -21,17 +26,18 @@ export function useScoreCalc() {
       clinical: { earned: 0, max: 0 },
     };
 
-    auditQuestions.forEach((q) => {
+    relevantQuestions.forEach((q) => {
       const qScore = scores[q.id] || 0;
       earnedScore += qScore;
       categoryScores[q.category].earned += qScore;
       categoryScores[q.category].max += q.maxScore || 5;
+      totalMaxScore += q.maxScore || 5;
     });
 
     const percentage = totalMaxScore === 0 ? 0 : Math.round((earnedScore / totalMaxScore) * 100);
 
     return { earnedScore, totalMaxScore, percentage, categoryScores };
-  }, [scores]);
+  }, [scores, storeBrand]);
 
   const calculateCategoryStats = (audits: SavedAudit[]) => {
     const categories: AuditCategory[] = ['cleanliness', 'merchandising', 'operations', 'staff', 'clinical'];
@@ -39,7 +45,10 @@ export function useScoreCalc() {
       let earned = 0;
       let max = 0;
       
-      audits.forEach(audit => {
+      (audits || []).forEach(audit => {
+        // Only include clinical if the specific audit was for a LensCrafters store
+        if (cat === 'clinical' && audit?.headerInfo?.storeBrand !== 'LensCrafters') return;
+
         auditQuestions.filter(q => q.category === cat).forEach(q => {
           earned += audit.scores[q.id] || 0;
           max += q.maxScore || 5;

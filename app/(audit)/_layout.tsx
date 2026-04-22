@@ -66,7 +66,9 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
 export default function AuditLayout() {
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams();
-  const { completedAudits, loadAudit, setReadOnly } = (useAuditStore() as any); // Type cast for convenience
+  const { completedAudits, loadAudit, setReadOnly, headerInfo } = (useAuditStore() as any);
+  
+  const isLensCrafters = headerInfo?.storeBrand === 'LensCrafters';
 
   React.useEffect(() => {
     if (params.auditId) {
@@ -97,8 +99,13 @@ export default function AuditLayout() {
           <Tabs.Screen name="merchandising" options={{ title: 'Merch' }} />
           <Tabs.Screen name="operations" options={{ title: 'Ops' }} />
           <Tabs.Screen name="staff" options={{ title: 'Staff' }} />
-          <Tabs.Screen name="clinical" options={{ title: 'Clinic' }} />
-          <Tabs.Screen name="new-audit" options={{ href: null }} />
+          <Tabs.Screen 
+            name="clinical" 
+            options={{ 
+              title: 'Clinic',
+              href: isLensCrafters ? undefined : null // Hide if not LensCrafters
+            }} 
+          />
         </Tabs>
       </View>
       

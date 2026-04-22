@@ -3,7 +3,7 @@ import { View, Text, Modal, Pressable, ScrollView, Alert, ActivityIndicator } fr
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system/legacy';
+import * as FileSystem from 'expo-file-system';
 import { useAuditStore } from '../store/auditStore';
 import { useScoreCalc } from '../hooks/useScoreCalc';
 import { auditQuestions, AuditCategory } from '../data/auditQuestions';
@@ -31,12 +31,14 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
 
   const generateHtml = async () => {
     // 1. Generate Category Tables
+    const isLensCrafters = headerInfo?.storeBrand === 'LensCrafters';
+    
     const categories: { key: AuditCategory; label: string }[] = [
       { key: 'cleanliness', label: 'Cleanliness & Hygiene' },
-      { key: 'merchandising', label: 'Visual Merchandising & Brand Identity' },
+      { key: 'merchandising', label: 'Visual Merchandising & Brand Integrity' },
       { key: 'operations', label: 'Store Operations & Asset Protection' },
       { key: 'staff', label: 'Staff Behaviour & Customer Experience' },
-      { key: 'clinical', label: 'LensCrafters Clinical Operations' },
+      ...(isLensCrafters ? [{ key: 'clinical', label: 'LensCrafters Clinical Operations' } as const] : []),
     ];
 
     let tablesHtml = '';

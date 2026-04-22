@@ -20,7 +20,9 @@ export const locationData: LocationDatabase = {
       { name: "Garuda Mall, Bangalore", code: "TA9K / 7114", brand: "Sunglass Hut" },
       { name: "VR Xander Mall, Bengaluru", code: "TA5V / 8476", brand: "Sunglass Hut" },
       { name: "Falcon City, Bangalore", code: "T44G / P073", brand: "Sunglass Hut" },
-      { name: "Mall of Asia", code: "T6OM / P765", brand: "Sunglass Hut" }
+      { name: "Lenscrafters, Brigade Orion Mall", code: "LC-BOM-71", brand: "LensCrafters" },
+      { name: "Lenscrafters, 100 feet road (Indiranagar)", code: "LC-IND-100", brand: "LensCrafters" },
+      { name: "Lenscrafters, Mall of Asia", code: "LC-MOA-88", brand: "LensCrafters" }
     ]
   }
 };
