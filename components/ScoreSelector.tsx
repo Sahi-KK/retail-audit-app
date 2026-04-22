@@ -37,16 +37,15 @@ interface ScorePillProps {
 }
 
 function ScorePill({ value, isSelected, onPress, disabled }: ScorePillProps) {
-  const animatedStyle = useAnimatedStyle(() => {
-    const getBgColor = () => {
-      if (!isSelected) return 'transparent';
-      if (value >= 4) return '#10B981'; // Emerald (Excellent)
-      if (value >= 2) return '#F59E0B'; // Amber (Needs Work)
-      return '#EF4444'; // Red (Critical)
-    };
+  const getBgColor = () => {
+    if (!isSelected) return 'transparent';
+    if (value >= 4) return '#10B981'; // Emerald
+    if (value >= 2) return '#F59E0B'; // Amber
+    return '#EF4444'; // Red
+  };
 
+  const animatedStyle = useAnimatedStyle(() => {
     return {
-      backgroundColor: withSpring(getBgColor()),
       transform: [{ scale: withSpring(isSelected ? 1.05 : 1) }],
     };
   });
@@ -57,7 +56,7 @@ function ScorePill({ value, isSelected, onPress, disabled }: ScorePillProps) {
         if (disabled) return;
         onPress();
       }}
-      className={`flex-1 items-center justify-center py-2.5 rounded-2xl mx-1 ${
+      className={`flex-1 items-center justify-center py-2 rounded-2xl mx-1 ${
         disabled && !isSelected ? 'opacity-30' : ''
       }`}
     >
@@ -65,8 +64,9 @@ function ScorePill({ value, isSelected, onPress, disabled }: ScorePillProps) {
         style={[animatedStyle, { 
           width: '100%', 
           alignItems: 'center', 
-          paddingVertical: 14, 
-          borderRadius: 16,
+          paddingVertical: 10, 
+          borderRadius: 14,
+          backgroundColor: getBgColor(),
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: isSelected ? 0.2 : 0,
