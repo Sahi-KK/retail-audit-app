@@ -25,6 +25,7 @@ export function useScoreCalc() {
       operations: { earned: 0, max: 0 },
       staff: { earned: 0, max: 0 },
       clinical: { earned: 0, max: 0 },
+      rayban_meta: { earned: 0, max: 0 },
     };
 
     relevantQuestions.forEach((q) => {
@@ -41,7 +42,7 @@ export function useScoreCalc() {
   }, [scores, storeBrand]);
 
   const calculateCategoryStats = (audits: SavedAudit[]) => {
-    const categories: AuditCategory[] = ['cleanliness', 'merchandising', 'operations', 'staff', 'clinical'];
+    const categories: AuditCategory[] = ['cleanliness', 'merchandising', 'operations', 'staff', 'clinical', 'rayban_meta'];
     const results = categories.map(cat => {
       let earned = 0;
       let max = 0;

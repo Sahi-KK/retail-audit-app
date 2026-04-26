@@ -38,6 +38,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       { key: 'merchandising', label: 'Visual Merchandising & Brand Integrity' },
       { key: 'operations', label: 'Store Operations & Asset Protection' },
       { key: 'staff', label: 'Staff Behaviour & Customer Experience' },
+      { key: 'rayban_meta', label: 'Ray-Ban Meta Excellence' },
       ...(isLensCrafters ? [{ key: 'clinical', label: 'LensCrafters Clinical Operations' } as const] : []),
     ];
 

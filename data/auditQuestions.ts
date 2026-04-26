@@ -1,4 +1,4 @@
-export type AuditCategory = 'cleanliness' | 'merchandising' | 'operations' | 'staff' | 'clinical';
+export type AuditCategory = 'cleanliness' | 'merchandising' | 'operations' | 'staff' | 'clinical' | 'rayban_meta';
 
 export interface AuditQuestion {
   id: string;
@@ -225,6 +225,116 @@ export const auditQuestions: AuditQuestion[] = [
     id: 'l9',
     category: 'clinical',
     text: 'Top-Down Price Anchoring: When discussing lenses, does the associate initiate the conversation by anchoring with the premium option first?',
+    maxScore: 5
+  },
+
+  // Tab 6: Ray-Ban Meta Excellence
+  {
+    id: 'rm1',
+    category: 'rayban_meta',
+    text: 'The Meta Choice: Does the staff offer a clear choice between standard sunglasses and Ray-Ban Meta AI during the initial greeting?',
+    maxScore: 5
+  },
+  {
+    id: 'rm2',
+    category: 'rayban_meta',
+    text: 'Style-First Fit: Does the associate prioritize finding the correct frame style and fit BEFORE introducing the smart features?',
+    maxScore: 5
+  },
+  {
+    id: 'rm3',
+    category: 'rayban_meta',
+    text: 'The Rule of Three: Does the staff group the pitch into 3 clear benefits: AI Help, Hands-free Capture, and All-day Convenience?',
+    maxScore: 5
+  },
+  {
+    id: 'rm4',
+    category: 'rayban_meta',
+    text: 'Lifestyle Discovery: Did the staff identify a specific customer need (Travel, Work, or Content Creation) to match features?',
+    maxScore: 5
+  },
+  {
+    id: 'rm5',
+    category: 'rayban_meta',
+    text: 'Advanced AI Demo: Does the staff mention or demonstrate high-value AI features like Live Translation or Hindi Interaction?',
+    maxScore: 5
+  },
+  {
+    id: 'rm6',
+    category: 'rayban_meta',
+    text: 'POV Capture Pitch: Was the 12MP camera and 3K video pitched specifically for hands-free "Point-of-View" memories?',
+    maxScore: 5
+  },
+  {
+    id: 'rm7',
+    category: 'rayban_meta',
+    text: 'Hardware Readiness: Is the Ray-Ban Meta demo unit fully functional, clean, and sufficiently charged for customer trial?',
+    maxScore: 5
+  },
+  {
+    id: 'rm8',
+    category: 'rayban_meta',
+    text: 'Objection Handling: For technical or price objections, did staff simplify the product or link value back to the customer\'s lifestyle?',
+    maxScore: 5
+  },
+  {
+    id: 'rm9',
+    category: 'rayban_meta',
+    text: 'Value Defense: Did staff frame the product as "3 products in one" (Premium Ray-Ban + AI Assistant + Hands-free Tool)?',
+    maxScore: 5
+  },
+  {
+    id: 'rm10',
+    category: 'rayban_meta',
+    text: 'Onboarding Assurance: Does the staff commit to a post-purchase setup walkthrough (Meta AI App & Charging Case)?',
+    maxScore: 5
+  },
+  {
+    id: 'rm11',
+    category: 'rayban_meta',
+    text: 'Staff Identity Hook: Does the staff introduce themselves and Sunglass Hut properly before diving into the product?',
+    maxScore: 5
+  },
+  {
+    id: 'rm12',
+    category: 'rayban_meta',
+    text: 'Curiosity Positioning: Was the product introduced as an "Advanced AI Wearable" and a "one-of-a-kind product"?',
+    maxScore: 5
+  },
+  {
+    id: 'rm13',
+    category: 'rayban_meta',
+    text: 'Live AI Context: Did staff explain that Meta AI understands the "context" around the user and responds naturally?',
+    maxScore: 5
+  },
+  {
+    id: 'rm14',
+    category: 'rayban_meta',
+    text: 'Text Actions Mastery: Did staff pitch "Text Actions" (reading signs, calling numbers, or scanning QR codes) as a core benefit?',
+    maxScore: 5
+  },
+  {
+    id: 'rm15',
+    category: 'rayban_meta',
+    text: 'Contextual Reminders: Did staff mention AI reminders, such as remembering where a car is parked or a grocery list?',
+    maxScore: 5
+  },
+  {
+    id: 'rm16',
+    category: 'rayban_meta',
+    text: 'Open-Ear Audio: Was the audio experience (open-ear speakers and built-in microphones) pitched for daily convenience?',
+    maxScore: 5
+  },
+  {
+    id: 'rm17',
+    category: 'rayban_meta',
+    text: 'Practicality Pitch: Did staff mention the extra power from the charging case and the 8-hour battery life?',
+    maxScore: 5
+  },
+  {
+    id: 'rm18',
+    category: 'rayban_meta',
+    text: 'The Soft Close: Did the staff move toward a decision by linking the preferred frame back to the specific AI value?',
     maxScore: 5
   }
 ];

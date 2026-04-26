@@ -37,6 +37,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
             if (route.name === 'operations') category = 'operations';
             if (route.name === 'staff') category = 'staff';
             if (route.name === 'clinical') category = 'clinical';
+            if (route.name === 'rayban_meta') category = 'rayban_meta';
 
             const catScore = categoryScores[category];
             const isDone = catScore.earned > 0;
@@ -104,6 +105,7 @@ export default function AuditLayout() {
           <Tabs.Screen name="merchandising" options={{ title: 'Merch' }} />
           <Tabs.Screen name="operations" options={{ title: 'Ops' }} />
           <Tabs.Screen name="staff" options={{ title: 'Staff' }} />
+          <Tabs.Screen name="rayban_meta" options={{ title: 'Ray-Ban Meta' }} />
           <Tabs.Screen 
             name="clinical" 
             options={{ 
