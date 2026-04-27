@@ -34,6 +34,8 @@ export interface SavedAudit {
   totalMax: number;
   completedAt: string;
   isDraft: boolean;
+  isSynced?: boolean;
+  cloudFileId?: string;
 }
 
 interface AuditStore {
@@ -64,6 +66,7 @@ interface AuditStore {
   loadAudit: (audit: SavedAudit) => void;
   setReadOnly: (val: boolean) => void;
   submitAudit: (stats: { percentage: number, earned: number, total: number }) => void;
+  markAsSynced: (auditId: string, cloudFileId?: string) => void;
   deleteAudit: (auditId: string) => void;
   resetAudit: () => void;
   
@@ -177,7 +180,8 @@ export const useAuditStore = create<AuditStore>()(
           finalScore: stats.earned,
           totalMax: stats.total,
           completedAt: new Date().toISOString(),
-          isDraft: false
+          isDraft: false,
+          isSynced: false
         };
 
         set((state) => {
@@ -199,6 +203,14 @@ export const useAuditStore = create<AuditStore>()(
             photos: []
           };
         });
+      },
+
+      markAsSynced: (auditId, cloudFileId) => {
+        set((state) => ({
+          completedAudits: state.completedAudits.map(a => 
+            a.id === auditId ? { ...a, isSynced: true, cloudFileId } : a
+          )
+        }));
       },
 
       deleteAudit: (auditId) => {

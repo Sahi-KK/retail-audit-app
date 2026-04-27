@@ -176,11 +176,11 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
   };
 
   const getFormattedFileName = () => {
-    const store = (headerInfo.store || 'Store').replace(/[|\\/?:*<>"]/g, '');
-    const code = headerInfo.storeCode || 'NA';
-    const city = headerInfo.city || 'City';
+    const store = (headerInfo.store || 'Store').replace(/[|\\/?:*<>"]/g, '_');
+    const code = (headerInfo.storeCode || 'NA').replace(/[|\\/?:*<>"]/g, '_');
+    const city = (headerInfo.city || 'City').replace(/[|\\/?:*<>"]/g, '_');
     const date = headerInfo.date || new Date().toISOString().split('T')[0];
-    return `${store}_${code} | ${city} | ${date}.pdf`;
+    return `${store}_${code}_${city}_${date}.pdf`;
   };
 
   const handleSyncToCloud = async () => {
@@ -269,21 +269,47 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       // Rename file for sharing
       const customName = getFormattedFileName();
       const newUri = FileSystem.cacheDirectory + customName;
+      
+      // Ensure the destination is clean
+      const fileInfo = await FileSystem.getInfoAsync(newUri);
+      if (fileInfo.exists) {
+        await FileSystem.deleteAsync(newUri);
+      }
+
       await FileSystem.copyAsync({
         from: currentUri,
         to: newUri
       });
 
-      await Sharing.shareAsync(newUri);
+      const canShare = await Sharing.isAvailableAsync();
+      if (!canShare) {
+        Alert.alert("Incompatible", "Sharing is not available on this device.");
+        return;
+      }
+
+      await Sharing.shareAsync(newUri, {
+        mimeType: 'application/pdf',
+        dialogTitle: 'Share Retail Audit Report',
+        UTI: 'com.adobe.pdf'
+      });
     } catch (error) {
-      Alert.alert("Error", "Failed to generate or share the report.");
+      console.error("Sharing Error:", error);
+      const msg = error instanceof Error ? error.message : "Internal Sharing Failure";
+      Alert.alert("Export Error", `Failed to generate or share the report: ${msg}`);
     }
   };
 
   const handleFinalize = async () => {
+    const finalId = activeAuditId || Date.now().toString();
+    
     if (syncStatus === 'success') {
       if (!isReadOnly) {
         submitAudit({ percentage, earned: earnedScore, total: totalMaxScore });
+        // The submitAudit resets everything, but we need the audit in history to be marked as synced
+        // However, submitAudit creates a NEW entry. 
+        // We should probably mark the most recent one as synced if it matches finalId
+        const { markAsSynced } = useAuditStore.getState();
+        markAsSynced(finalId);
         onClose();
         router.replace('/');
       }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { ChevronRight, Calendar, MapPin, User } from 'lucide-react-native';
+import { ChevronRight, Calendar, MapPin, User, Cloud, CloudOff } from 'lucide-react-native';
 import { SavedAudit } from '../store/auditStore';
 
 interface HistoryCardProps {
@@ -24,11 +24,18 @@ export function HistoryCard({ audit, onPress }: HistoryCardProps) {
     >
       <View className="flex-row justify-between items-start mb-3">
         <View className="flex-1 mr-4">
-          {audit.headerInfo.storeCode ? (
-            <Text className="text-gold/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">
-              {audit.headerInfo.storeCode}
-            </Text>
-          ) : null}
+          <View className="flex-row items-center mb-0.5">
+             {audit.headerInfo.storeCode ? (
+              <Text className="text-gold/60 text-[10px] font-bold uppercase tracking-widest mr-2">
+                {audit.headerInfo.storeCode}
+              </Text>
+            ) : null}
+            {audit.isSynced ? (
+              <Cloud size={10} color="#10B981" />
+            ) : (
+              <CloudOff size={10} color="#94A3B8" />
+            )}
+          </View>
           <Text className="text-navy font-bold text-lg mb-1" numberOfLines={1}>
             {audit.headerInfo.store || 'Untitled Store'}
           </Text>
@@ -56,6 +63,11 @@ export function HistoryCard({ audit, onPress }: HistoryCardProps) {
         </View>
         
         <View className="flex-row items-center">
+          {audit.isSynced ? (
+            <Text className="text-emerald-500/60 font-black text-[8px] uppercase tracking-widest mr-3">Vaulted</Text>
+          ) : (
+            <Text className="text-rose-500/60 font-black text-[8px] uppercase tracking-widest mr-3">Local Only</Text>
+          )}
           <Text className="text-navy font-semibold text-xs mr-1 opacity-40">View Report</Text>
           <ChevronRight size={14} color="#0A0F1E" opacity={0.3} />
         </View>

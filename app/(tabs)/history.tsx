@@ -88,22 +88,64 @@ export default function GlobalHistoryScreen() {
     return 'text-red-500';
   };
 
+  const handleSyncItem = async (item: any) => {
+    setIsLoadingCloud(true);
+    try {
+      const syncPayload = {
+        id: item.id,
+        header: item.headerInfo,
+        percentage: item.finalPercentage,
+        earned: item.finalScore,
+        total: item.totalMax,
+        categoryBreakdown: {}, // History items might not have this cached easily, but we can try to reconstruct or just send main stats
+        scores: item.scores,
+        timestamp: item.completedAt
+      };
+
+      const syncResult = await googleSheetsService.syncAudit(syncPayload, null); // Manual sync usually skip PDF for speed if not already generated
+      if (syncResult.status === 'success') {
+        const { markAsSynced } = useAuditStore.getState();
+        markAsSynced(item.id);
+        Alert.alert("Success", "Audit synced to cloud successfully.");
+      } else {
+        Alert.alert("Sync Failed", syncResult.message || "Check connection");
+      }
+    } catch (e) {
+      Alert.alert("Error", "Failed to sync audit.");
+    } finally {
+      setIsLoadingCloud(false);
+    }
+  };
+
   const renderLocalItem = ({ item }: { item: any }) => {
     const headerInfo = item.headerInfo || {};
     return (
-      <View className="bg-white rounded-[32px] p-6 mb-6 shadow-sm">
+      <View className="bg-white rounded-[32px] p-6 mb-6 shadow-sm border border-slate-100">
         <Pressable
           onPress={() => router.push(`/(audit)/cleanliness?auditId=${item.id}`)}
           className="active:opacity-80"
         >
           <View className="flex-row justify-between items-start mb-4">
             <View className="flex-1 mr-4">
-              <Text className="text-slate-800 font-bold text-lg tracking-tight" numberOfLines={1}>
-                {headerInfo.store || 'Standard Store'}
-              </Text>
-              <View className="flex-row items-center mt-1.5">
+              <View className="flex-row items-center mb-1">
+                <Text className="text-slate-800 font-bold text-lg tracking-tight" numberOfLines={1}>
+                  {headerInfo.store || 'Standard Store'}
+                </Text>
+                {item.isSynced ? (
+                  <View className="ml-2 bg-emerald-50 px-2 py-0.5 rounded-full flex-row items-center">
+                    <Cloud size={10} color="#10B981" />
+                    <Text className="text-[8px] font-bold text-emerald-600 ml-1">SYNCED</Text>
+                  </View>
+                ) : (
+                  <View className="ml-2 bg-slate-50 px-2 py-0.5 rounded-full flex-row items-center">
+                    <Smartphone size={10} color="#94A3B8" />
+                    <Text className="text-[8px] font-bold text-slate-400 ml-1">LOCAL</Text>
+                  </View>
+                )}
+              </View>
+              <View className="flex-row items-center mt-0.5">
                 <Text className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mr-3">
-                  {new Date(item.completedAt || Date.now()).toLocaleDateString()} • LOCAL DRAFT
+                  {new Date(item.completedAt || Date.now()).toLocaleDateString()}
                 </Text>
                 <Badge brand={headerInfo.storeBrand} />
               </View>
@@ -114,19 +156,31 @@ export default function GlobalHistoryScreen() {
           </View>
         </Pressable>
         
-        <View className="flex-row items-center justify-end pt-4 border-t border-slate-50 mt-2 gap-x-5">
-           <Pressable 
-             onPress={() => router.push(`/(audit)/cleanliness?auditId=${item.id}&isEditMode=true`)}
-             className="bg-slate-50 p-2.5 rounded-xl"
-           >
-             <Pencil size={18} color="#94A3B8" />
-           </Pressable>
-           <Pressable 
-             onPress={() => handleDelete(item.id)}
-             className="bg-slate-50 p-2.5 rounded-xl"
-           >
-             <Trash2 size={18} color="#FDA4AF" />
-           </Pressable>
+        <View className="flex-row items-center justify-between pt-4 border-t border-slate-50 mt-2">
+           <View className="flex-row gap-x-5">
+             <Pressable 
+               onPress={() => router.push(`/(audit)/cleanliness?auditId=${item.id}&isEditMode=true`)}
+               className="bg-slate-50 p-2.5 rounded-xl"
+             >
+               <Pencil size={18} color="#94A3B8" />
+             </Pressable>
+             <Pressable 
+               onPress={() => handleDelete(item.id)}
+               className="bg-slate-50 p-2.5 rounded-xl"
+             >
+               <Trash2 size={18} color="#FDA4AF" />
+             </Pressable>
+           </View>
+
+           {!item.isSynced && (
+              <Pressable 
+                onPress={() => handleSyncItem(item)}
+                className="flex-row items-center bg-gold px-5 py-2.5 rounded-2xl shadow-sm active:scale-95"
+              >
+                <Cloud size={14} color="#0A0F1E" />
+                <Text className="ml-2 text-[10px] font-black uppercase tracking-widest text-navy">Sync to Cloud</Text>
+              </Pressable>
+           )}
         </View>
       </View>
     );
