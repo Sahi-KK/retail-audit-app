@@ -205,7 +205,8 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       });
       setPdfUri(uri);
 
-      const isTooLarge = base64 && base64.length > 5.5 * 1024 * 1024;
+      // GHOST SHIELD: Increased limit to 45MB (Google Apps Script limit is 50MB)
+      const isTooLarge = base64 && base64.length > 45 * 1024 * 1024;
       
       const safeHeader = {
         ...headerInfo,
@@ -223,6 +224,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
           total: totalMaxScore,
           categoryBreakdown: categoryScores,
           scores,
+          photos: photos.map(p => ({ title: p.title, tag: p.tag, timestamp: p.timestamp })), // Send metadata
           timestamp: new Date().toISOString()
         },
         pdfBase64: isTooLarge ? null : base64
@@ -230,6 +232,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
 
       if (isTooLarge) {
         setPdfTooLarge(true);
+        console.warn("PDF Payload too large for cloud sync, stripped images to save data integrity.");
       }
       
       const syncResult = await googleSheetsService.syncAudit(syncPayload.auditData, syncPayload.pdfBase64 as string);
