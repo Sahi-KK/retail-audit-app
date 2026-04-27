@@ -94,7 +94,18 @@ export function PhotoEvidence() {
               className="mr-4 relative active:scale-95"
             >
               <Image source={{ uri: p.uri }} className="w-20 h-20 rounded-[20px] bg-slate-100 border border-slate-50" />
-              <View className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm">
+              <View className="absolute -top-1 -right-1 bg-white rounded-full p-1 shadow-sm border border-slate-50">
+                <Pressable onPress={() => {
+                   if (isReadOnly) return;
+                   Alert.alert('Remove Evidence?', p.title, [
+                     { text: 'Cancel', style: 'cancel' },
+                     { text: 'Remove', style: 'destructive', onPress: () => removePhoto(p.id) }
+                   ]);
+                }}>
+                   <X size={10} color="#EF4444" />
+                </Pressable>
+              </View>
+              <View className="absolute -bottom-1 -left-1 bg-white rounded-full p-1 shadow-sm">
                 {p.tag === 'positive' ? (
                   <PlusCircle size={14} color="#10B981" />
                 ) : (
@@ -189,10 +200,34 @@ export function PhotoEvidence() {
  
               <Pressable
                 onPress={handleSaveDraft}
-                className="bg-slate-900 py-6 rounded-[32px] items-center shadow-xl active:opacity-90 active:scale-[0.98]"
+                className="bg-slate-900 py-6 rounded-[32px] items-center shadow-xl active:opacity-90 active:scale-[0.98] mb-4"
               >
-                <Text className="text-white font-black text-lg tracking-tight">Finalize Evidence</Text>
+                <Text className="text-white font-black text-lg tracking-tight">
+                  {editingId ? 'Update Evidence' : 'Finalize Evidence'}
+                </Text>
               </Pressable>
+
+              {editingId && (
+                <Pressable
+                  onPress={() => {
+                    Alert.alert('Remove Evidence?', 'Are you sure you want to delete this photo?', [
+                      { text: 'Cancel', style: 'cancel' },
+                      { 
+                        text: 'Delete', 
+                        style: 'destructive', 
+                        onPress: () => {
+                          removePhoto(editingId);
+                          setModalVisible(false);
+                          setEditingId(null);
+                        } 
+                      }
+                    ]);
+                  }}
+                  className="bg-red-50 py-4 rounded-[24px] items-center active:opacity-70"
+                >
+                  <Text className="text-red-500 font-bold text-sm uppercase tracking-widest">Delete Evidence Material</Text>
+                </Pressable>
+              )}
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
