@@ -3,7 +3,7 @@ import { View, Text, Modal, Pressable, ScrollView, Alert, ActivityIndicator } fr
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useAuditStore } from '../store/auditStore';
 import { useScoreCalc } from '../hooks/useScoreCalc';
 import { auditQuestions, AuditCategory } from '../data/auditQuestions';
@@ -85,6 +85,12 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       
       for (const photo of photos) {
         try {
+          const info = await FileSystem.getInfoAsync(photo.uri);
+          if (!info.exists) {
+            console.warn(`Photo not found at URI: ${photo.uri}`);
+            continue;
+          }
+
           const base64Str = await FileSystem.readAsStringAsync(photo.uri, { encoding: 'base64' });
           const imgSrc = `data:image/jpeg;base64,${base64Str}`;
           const badgeColor = photo.tag === 'positive' ? '#10B981' : '#EF4444';
