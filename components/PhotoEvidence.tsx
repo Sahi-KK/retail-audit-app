@@ -6,11 +6,12 @@ import { useAuditStore } from '../store/auditStore';
 import { useScoreCalc } from '../hooks/useScoreCalc';
 
 export function PhotoEvidence() {
-  const { photos, addPhoto, removePhoto } = useAuditStore();
+  const { photos, addPhoto, updatePhoto, removePhoto } = useAuditStore();
   const [status, requestPermission] = ImagePicker.useCameraPermissions();
   const { isReadOnly } = useScoreCalc();
   
   const [modalVisible, setModalVisible] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [draftUri, setDraftUri] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState('');
   const [draftRemark, setDraftRemark] = useState('');
@@ -28,6 +29,7 @@ export function PhotoEvidence() {
     });
 
     if (!result.canceled && result.assets[0]) {
+      setEditingId(null);
       setDraftUri(result.assets[0].uri);
       setDraftTitle('');
       setDraftRemark('');
@@ -36,22 +38,41 @@ export function PhotoEvidence() {
     }
   };
 
+  const openEditModal = (photo: any) => {
+    if (isReadOnly) return;
+    setEditingId(photo.id);
+    setDraftUri(photo.uri);
+    setDraftTitle(photo.title);
+    setDraftRemark(photo.remark);
+    setDraftTag(photo.tag);
+    setModalVisible(true);
+  };
+
   const handleSaveDraft = () => {
     if (!draftTitle.trim() || !draftRemark.trim() || !draftTag || !draftUri) {
       Alert.alert('Missing Fields', 'Please complete the title, remark, and select a tag before saving.');
       return;
     }
 
-    addPhoto({
-      id: Date.now().toString(),
-      uri: draftUri,
-      title: draftTitle,
-      remark: draftRemark,
-      tag: draftTag,
-      timestamp: new Date().toISOString()
-    });
+    if (editingId) {
+      updatePhoto(editingId, {
+        title: draftTitle,
+        remark: draftRemark,
+        tag: draftTag
+      });
+    } else {
+      addPhoto({
+        id: Date.now().toString(),
+        uri: draftUri,
+        title: draftTitle,
+        remark: draftRemark,
+        tag: draftTag,
+        timestamp: new Date().toISOString()
+      });
+    }
 
     setModalVisible(false);
+    setEditingId(null);
     setDraftUri(null);
   };
 
@@ -62,6 +83,7 @@ export function PhotoEvidence() {
           {photos.map((p) => (
             <Pressable 
               key={p.id} 
+              onPress={() => openEditModal(p)}
               onLongPress={() => {
                 if (isReadOnly) return;
                 Alert.alert('Remove Evidence?', p.title, [
@@ -102,7 +124,9 @@ export function PhotoEvidence() {
           <View className="bg-white rounded-t-[48px] pt-10 pb-12 px-8 relative h-[92%] shadow-2xl">
             <View className="flex-row justify-between items-start mb-8">
               <View>
-                <Text className="text-3xl font-black text-slate-900 tracking-tighter">Evidence Entry</Text>
+                <Text className="text-3xl font-black text-slate-900 tracking-tighter">
+                  {editingId ? 'Edit Evidence' : 'Evidence Entry'}
+                </Text>
                 <Text className="text-[10px] font-black text-slate-400 uppercase tracking-[3px] mt-2">Visual Documentation</Text>
               </View>
               <Pressable onPress={() => setModalVisible(false)} className="bg-slate-50 p-3 rounded-2xl active:scale-95">

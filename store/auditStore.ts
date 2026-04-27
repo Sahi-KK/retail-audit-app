@@ -61,6 +61,7 @@ interface AuditStore {
   setHeaderField: (field: keyof HeaderInfo, value: string | boolean) => void;
   setScore: (questionId: string, score: number) => void;
   addPhoto: (photo: PhotoEvidence) => void;
+  updatePhoto: (photoId: string, updatedData: Partial<PhotoEvidence>) => void;
   removePhoto: (photoId: string) => void;
   startNewAudit: () => void;
   loadAudit: (audit: SavedAudit) => void;
@@ -131,6 +132,13 @@ export const useAuditStore = create<AuditStore>()(
         set((state) => ({
           photos: [...state.photos, photo],
           activeAuditId: state.activeAuditId || Date.now().toString()
+        }));
+      },
+
+      updatePhoto: (photoId, updatedData) => {
+        if (get().isReadOnly) return;
+        set((state) => ({
+          photos: state.photos.map(p => p.id === photoId ? { ...p, ...updatedData } : p)
         }));
       },
         
