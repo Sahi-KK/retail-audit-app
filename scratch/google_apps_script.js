@@ -67,6 +67,10 @@ function getAuditorHistory(auditorId) {
     const sheets = ss.getSheets();
     let history = [];
 
+    // Pre-cache folder link for faster lookup if possible
+    let masterFolder = getFileByName(MASTER_ARCHIVE_FOLDER, "folder");
+    let folderMap = {};
+
     sheets.forEach(sheet => {
       if (sheet.getName() === "GLOBAL_SUMMARY") return;
       
@@ -82,6 +86,19 @@ function getAuditorHistory(auditorId) {
       
       if (audIdIdx === -1) return;
 
+      // Find store folder link
+      let vaultLink = "N/A";
+      const storeName = sheet.getName().split(" - ")[1] || sheet.getName();
+      if (masterFolder) {
+        if (!folderMap[storeName]) {
+          const folders = masterFolder.getFoldersByName(storeName);
+          if (folders.hasNext()) {
+            folderMap[storeName] = folders.next().getUrl();
+          }
+        }
+        vaultLink = folderMap[storeName] || "N/A";
+      }
+
       for (let i = 1; i < data.length; i++) {
         const rowId = (data[i][audIdIdx] || "").toString().trim();
         if (rowId === auditorId) {
@@ -91,6 +108,7 @@ function getAuditorHistory(auditorId) {
             store: sheet.getName(),
             score: scoreIdx !== -1 ? data[i][scoreIdx] : "0%",
             link: linkIdx !== -1 ? data[i][linkIdx] : "N/A",
+            vaultLink: vaultLink,
             timestamp: new Date(data[i][dateIdx] || Date.now()).getTime()
           });
         }

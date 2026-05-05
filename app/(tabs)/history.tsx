@@ -230,14 +230,25 @@ export default function GlobalHistoryScreen() {
           } 
         },
         { 
+          text: "Open Cloud Vault (Folder)", 
+          onPress: () => {
+            if (item.vaultLink && item.vaultLink !== 'N/A') {
+              console.log("Opening Vault Folder:", item.vaultLink);
+              WebBrowser.openBrowserAsync(item.vaultLink);
+            } else {
+              Alert.alert("Vault Unavailable", "Could not locate the Google Drive folder for this store.");
+            }
+          }
+        },
+        { 
           text: "View PDF Report", 
           onPress: () => {
             const reportUrl = item.link || item.pdfLink;
-            if (reportUrl && reportUrl !== 'N/A') {
+            if (reportUrl && reportUrl !== 'N/A' && reportUrl.startsWith('http')) {
               console.log("Opening Report:", reportUrl);
               WebBrowser.openBrowserAsync(reportUrl);
             } else {
-              Alert.alert("Legacy Audit", "This audit was recorded before the Cloud PDF feature was active.");
+              Alert.alert("Report Unavailable", "The direct PDF link is missing or corrupted. Try opening the Cloud Vault folder instead.");
             }
           }
         }
