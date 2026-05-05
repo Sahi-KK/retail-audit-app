@@ -28,6 +28,7 @@ export interface SavedAudit {
   id: string;
   headerInfo: HeaderInfo;
   scores: Record<string, number>;
+  remarks: Record<string, string>;
   photos: PhotoEvidence[];
   finalPercentage: number;
   finalScore: number;
@@ -49,6 +50,7 @@ interface AuditStore {
   activeAuditId: string | null;
   headerInfo: HeaderInfo;
   scores: Record<string, number>;
+  remarks: Record<string, string>;
   photos: PhotoEvidence[];
   
   // History & Custom Data
@@ -60,6 +62,7 @@ interface AuditStore {
   updateAuth: (name: string, id: string) => void;
   setHeaderField: (field: keyof HeaderInfo, value: string | boolean) => void;
   setScore: (questionId: string, score: number) => void;
+  setRemark: (questionId: string, remark: string) => void;
   addPhoto: (photo: PhotoEvidence) => void;
   updatePhoto: (photoId: string, updatedData: Partial<PhotoEvidence>) => void;
   removePhoto: (photoId: string) => void;
@@ -99,6 +102,7 @@ export const useAuditStore = create<AuditStore>()(
       activeAuditId: null,
       headerInfo: DEFAULT_HEADER,
       scores: {},
+      remarks: {},
       photos: [],
       completedAudits: [],
       customStores: [],
@@ -123,6 +127,14 @@ export const useAuditStore = create<AuditStore>()(
         if (get().isReadOnly) return;
         set((state) => ({
           scores: { ...state.scores, [questionId]: score },
+          activeAuditId: state.activeAuditId || Date.now().toString()
+        }));
+      },
+
+      setRemark: (questionId, remark) => {
+        if (get().isReadOnly) return;
+        set((state) => ({
+          remarks: { ...state.remarks, [questionId]: remark },
           activeAuditId: state.activeAuditId || Date.now().toString()
         }));
       },
@@ -160,6 +172,7 @@ export const useAuditStore = create<AuditStore>()(
             auditorId
           },
           scores: {},
+          remarks: {},
           photos: [],
           isReadOnly: false
         });
@@ -170,6 +183,7 @@ export const useAuditStore = create<AuditStore>()(
           activeAuditId: audit.id,
           headerInfo: audit.headerInfo,
           scores: audit.scores,
+          remarks: audit.remarks || {},
           photos: audit.photos
         }),
 
@@ -183,6 +197,7 @@ export const useAuditStore = create<AuditStore>()(
           id: auditId,
           headerInfo: state.headerInfo,
           scores: state.scores,
+          remarks: state.remarks,
           photos: state.photos,
           finalPercentage: stats.percentage,
           finalScore: stats.earned,
@@ -208,6 +223,7 @@ export const useAuditStore = create<AuditStore>()(
             activeAuditId: null,
             headerInfo: { ...DEFAULT_HEADER, auditorName, auditorId },
             scores: {},
+            remarks: {},
             photos: []
           };
         });
@@ -238,6 +254,7 @@ export const useAuditStore = create<AuditStore>()(
             auditorId
           },
           scores: {},
+          remarks: {},
           photos: [],
         });
       },

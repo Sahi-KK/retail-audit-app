@@ -24,7 +24,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
   const [pdfUri, setPdfUri] = React.useState<string | null>(null);
   const [pdfTooLarge, setPdfTooLarge] = React.useState(false);
   
-  const { headerInfo, photos, scores, submitAudit, isReadOnly, activeAuditId } = useAuditStore();
+  const { headerInfo, photos, scores, remarks, submitAudit, isReadOnly, activeAuditId } = useAuditStore();
   const { percentage, earnedScore, totalMaxScore, categoryScores } = useScoreCalc();
   const params = useLocalSearchParams();
   const isEditing = params.isEditMode === 'true';
@@ -50,10 +50,14 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
 
       catQuestions.forEach((q, idx) => {
         const score = scores[q.id] || 0;
+        const qRemark = remarks[q.id] || '';
         catEarned += score;
         rows += `
           <tr class="${idx % 2 === 0 ? 'even' : 'odd'}">
-            <td style="padding: 10px; border-bottom: 1px solid #eee; font-size: 11px; width: 85%;">${q.text}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; font-size: 11px; width: 85%;">
+              <div>${q.text}</div>
+              ${qRemark ? `<div style="margin-top: 5px; color: #D97706; font-style: italic; font-size: 10px; background: #FFFBEB; padding: 5px; border-radius: 4px;">Remark: ${qRemark}</div>` : ''}
+            </td>
             <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; text-align: center; width: 15%; color: #0A0F1E;">${score} / 5</td>
           </tr>
         `;
@@ -74,6 +78,36 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
         </div>
       `;
     });
+
+    // 1.5 Generate Remarks Summary Section
+    let remarksSummaryHtml = '';
+    const questionsWithRemarks = auditQuestions.filter(q => remarks[q.id] && remarks[q.id].trim().length > 0);
+    
+    if (questionsWithRemarks.length > 0) {
+      remarksSummaryHtml = `
+        <div style="margin-top: 40px; page-break-inside: avoid;">
+          <h2 style="color: #0A0F1E; border-left: 6px solid #D97706; padding-left: 15px; margin-bottom: 20px;">Strategic Observations (Remarks)</h2>
+          <table style="width: 100%; border-collapse: collapse; background: #FFFBEB; border: 1px solid #FEF3C7; border-radius: 12px; overflow: hidden;">
+            <thead>
+              <tr style="background: #FEF3C7; color: #92400E; text-align: left; font-size: 10px; text-transform: uppercase;">
+                <th style="padding: 12px;">Question Detail</th>
+                <th style="padding: 12px; text-align: center;">Score</th>
+                <th style="padding: 12px;">Auditor Remark</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${questionsWithRemarks.map(q => `
+                <tr style="border-bottom: 1px solid #FDE68A;">
+                  <td style="padding: 12px; font-size: 11px; font-weight: 600; width: 40%;">${q.text}</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 800; width: 10%;">${scores[q.id] || 0}</td>
+                  <td style="padding: 12px; font-size: 11px; color: #92400E; width: 50%;">${remarks[q.id]}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
 
     // 2. Generate Evidence Gallery
     let evidenceHtml = '';
@@ -162,6 +196,8 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
           <h2 style="color: #0A0F1E; border-left: 6px solid #C9A84C; padding-left: 15px; margin-bottom: 25px;">Detailed Category Scoring</h2>
           ${tablesHtml}
 
+          ${remarksSummaryHtml}
+
           ${evidenceHtml}
 
           <div style="margin-top: 60px; text-align: center; color: #9CA3AF; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px;">
@@ -238,7 +274,8 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
           total: totalMaxScore,
           categoryBreakdown: categoryScores,
           scores,
-          photos: photos.map(p => ({ title: p.title, tag: p.tag, timestamp: p.timestamp })), // Send metadata
+          remarks,
+          photos: photos.map(p => ({ title: p.title, tag: p.tag, timestamp: p.timestamp, remark: p.remark })), // Send metadata
           timestamp: new Date().toISOString()
         },
         pdfBase64: isTooLarge ? null : base64
