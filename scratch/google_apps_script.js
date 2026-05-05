@@ -1,12 +1,11 @@
 /** 
- * ESSILOR LUXOTTICA - AUDIT MASTER HUB v2.5 (COMPLETE GHOST SHIELD)
+ * ESSILOR LUXOTTICA - AUDIT MASTER HUB v3.0 (MULTI-USER ENTERPRISE)
  * Deployment: Deploy as Web App -> Execute as "Me" -> Access "Anyone"
  */
 
 const MASTER_FILE_NAME = "RETAIL_AUDIT_MASTER_DATABASE";
-const PDF_FOLDER_NAME = "AUDIT_REPORT_PDFS";
+const MASTER_ARCHIVE_FOLDER = "RETAIL_AUDIT_DOCUMENTS";
 
-// RUN ONCE TO AUTHORIZE
 function authorize() {
   DriveApp.getRootFolder();
 }
@@ -24,32 +23,27 @@ function doGet(e) {
     return getAuditDetail(auditId);
   }
 
-  return ContentService.createTextOutput("🛡️ MASTER HUB ACTIVE | TARGET ID: " + (auditorId || auditId))
+  return ContentService.createTextOutput("🛡️ ENTERPRISE HUB v3.0 | STATUS: ACTIVE")
     .setMimeType(ContentService.MimeType.TEXT);
 }
 
 function getAuditDetail(auditId) {
   try {
-    const file = getFileByName(MASTER_FILE_NAME, "spreadsheet");
-    if (!file) return ContentService.createTextOutput(JSON.stringify({})).setMimeType(ContentService.MimeType.JSON);
+    const ssFile = getFileByName(MASTER_FILE_NAME, "spreadsheet");
+    const ss = SpreadsheetApp.openById(ssFile.getId());
+    const indexSheet = ss.getSheetByName("GLOBAL_INDEX");
     
-    const ss = SpreadsheetApp.openById(file.getId());
-    const sheets = ss.getSheets();
+    if (!indexSheet) return ContentService.createTextOutput(JSON.stringify({error: "No Index Found"})).setMimeType(ContentService.MimeType.JSON);
     
-    for (let sheet of sheets) {
-      if (sheet.getName() === "GLOBAL_SUMMARY") continue;
-      const data = sheet.getDataRange().getValues();
-      const headers = data[0];
-      const idIdx = headers.indexOf("Record ID");
-      const dataIdx = headers.indexOf("RAW_DATA");
-      
-      if (idIdx === -1 || dataIdx === -1) continue;
-      
-      for (let i = 1; i < data.length; i++) {
-        if (data[i][idIdx].toString() === auditId) {
-          return ContentService.createTextOutput(data[i][dataIdx])
-            .setMimeType(ContentService.MimeType.JSON);
-        }
+    const data = indexSheet.getDataRange().getValues();
+    const headers = data[0];
+    const idIdx = headers.indexOf("Record ID");
+    const dataIdx = headers.indexOf("RAW_DATA");
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][idIdx].toString() === auditId) {
+        return ContentService.createTextOutput(data[i][dataIdx])
+          .setMimeType(ContentService.MimeType.JSON);
       }
     }
     return ContentService.createTextOutput(JSON.stringify({error: "Not Found"})).setMimeType(ContentService.MimeType.JSON);
@@ -64,40 +58,33 @@ function getAuditorHistory(auditorId) {
     if (!file) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
     
     const ss = SpreadsheetApp.openById(file.getId());
-    const sheets = ss.getSheets();
+    const indexSheet = ss.getSheetByName("GLOBAL_INDEX");
+    if (!indexSheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+
+    const data = indexSheet.getDataRange().getValues();
+    const headers = data[0];
+    const audIdIdx = headers.indexOf("Auditor ID");
+    const dateIdx = headers.indexOf("Audit Date");
+    const storeIdx = headers.indexOf("Store");
+    const scoreIdx = headers.indexOf("Final Score %");
+    const linkIdx = headers.indexOf("REPORT LINK");
+    const vaultIdx = headers.indexOf("VAULT LINK");
+    const recordIdIdx = headers.indexOf("Record ID");
+    
     let history = [];
-
-    sheets.forEach(sheet => {
-      if (sheet.getName() === "GLOBAL_SUMMARY") return;
-      
-      const data = sheet.getDataRange().getValues();
-      if (data.length < 2) return;
-      
-      const headers = data[0];
-      const audIdIdx = headers.findIndex(h => h.toString().replace(/\s/g, '').toLowerCase() === "auditorid");
-      const linkIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("REPORT LINK"));
-      const vaultIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("VAULT LINK"));
-      const dateIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("DATE"));
-      const scoreIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("SCORE"));
-      const recordIdIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("RECORD ID"));
-      
-      if (audIdIdx === -1) return;
-
-      for (let i = 1; i < data.length; i++) {
-        const rowId = (data[i][audIdIdx] || "").toString().trim();
-        if (rowId === auditorId) {
-          history.push({
-            id: recordIdIdx !== -1 ? data[i][recordIdIdx] : i,
-            date: dateIdx !== -1 ? data[i][dateIdx] : "N/A",
-            store: sheet.getName(),
-            score: scoreIdx !== -1 ? data[i][scoreIdx] : "0%",
-            link: linkIdx !== -1 ? data[i][linkIdx] : "N/A",
-            vaultLink: vaultIdx !== -1 ? data[i][vaultIdx] : "N/A",
-            timestamp: new Date(data[i][dateIdx] || Date.now()).getTime()
-          });
-        }
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][audIdIdx].toString().trim() === auditorId) {
+        history.push({
+          id: data[i][recordIdIdx],
+          date: data[i][dateIdx],
+          store: data[i][storeIdx],
+          score: data[i][scoreIdx],
+          link: data[i][linkIdx],
+          vaultLink: data[i][vaultIdx],
+          timestamp: new Date(data[i][dateIdx]).getTime()
+        });
       }
-    });
+    }
 
     history.sort((a, b) => b.timestamp - a.timestamp);
     return ContentService.createTextOutput(JSON.stringify(history)).setMimeType(ContentService.MimeType.JSON);
@@ -110,57 +97,51 @@ function doPost(e) {
   try {
     const payload = JSON.parse(e.postData.contents);
     const data = payload.auditData;
+    const auditorName = data.header.auditorName || "Unknown Auditor";
+    const auditorId = (data.header.auditorId || "NA").toString().trim();
     const storeCode = data.header.storeCode || "NA";
     const storeName = data.header.store || "Unknown Store";
     const tabName = storeCode + " - " + storeName.substring(0, 15);
     
-    let file = getFileByName(MASTER_FILE_NAME, "spreadsheet");
-    let ss = file ? SpreadsheetApp.openById(file.getId()) : SpreadsheetApp.create(MASTER_FILE_NAME);
+    let ssFile = getFileByName(MASTER_FILE_NAME, "spreadsheet");
+    let ss = ssFile ? SpreadsheetApp.openById(ssFile.getId()) : SpreadsheetApp.create(MASTER_FILE_NAME);
     
+    // 1. Archive PDF in Auditor Specific Folder
     let pdfUrl = "N/A";
     let vaultUrl = "N/A";
     if (payload.pdfBase64) {
-      const archiveResult = archivePdfReport(payload.pdfBase64, storeName + "_" + storeCode + "_" + Date.now() + ".pdf", storeName);
+      const archiveResult = archivePdfReport(payload.pdfBase64, storeName + "_" + Date.now() + ".pdf", auditorName, storeName);
       pdfUrl = archiveResult.fileUrl;
       vaultUrl = archiveResult.folderUrl;
     }
     
-    let sheet = ss.getSheetByName(tabName) || ss.insertSheet(tabName);
-    let headers = sheet.getLastColumn() > 0 ? sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0] : [];
-    
-    // Auto-Healing Headers with VAULT support
-    if (headers.indexOf("VAULT LINK") === -1) {
-      headers = ["Audit Date", "Auditor ID", "Auditor Name", "Final Score %", "Total Points", "Cleanliness", "Merchandising", "Operations", "Staff", "Clinical", "REPORT LINK", "VAULT LINK", "Record ID", "RAW_DATA"];
-      sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setBackground("#0A0F1E").setFontColor("#C9A84C").setFontWeight("bold");
+    // 2. Update Global Index (For Fast Retrieval)
+    let indexSheet = ss.getSheetByName("GLOBAL_INDEX") || ss.insertSheet("GLOBAL_INDEX", 0);
+    let indexHeaders = ["Audit Date", "Auditor ID", "Auditor Name", "Store", "Final Score %", "REPORT LINK", "VAULT LINK", "Record ID", "RAW_DATA"];
+    if (indexSheet.getLastColumn() === 0) {
+      indexSheet.getRange(1, 1, 1, indexHeaders.length).setValues([indexHeaders]).setBackground("#0A0F1E").setFontColor("#C9A84C").setFontWeight("bold");
     }
-    
-    const auditId = String(data.id);
-    const catScores = data.categoryBreakdown || {};
-    const fullRow = [];
-    headers.forEach(h => {
-      const hNorm = h.toString().trim();
-      if (hNorm === "Audit Date") fullRow.push(data.header.date);
-      else if (hNorm === "Auditor ID") fullRow.push((data.header.auditorId || "NA").toString().trim());
-      else if (hNorm === "Auditor Name") fullRow.push(data.header.auditorName || "Unknown");
-      else if (hNorm === "Final Score %") fullRow.push(data.percentage + "%");
-      else if (hNorm === "Total Points") fullRow.push(data.earned + " / " + data.total);
-      else if (hNorm === "REPORT LINK") fullRow.push(pdfUrl);
-      else if (hNorm === "VAULT LINK") fullRow.push(vaultUrl);
-      else if (hNorm === "Record ID") fullRow.push(auditId);
-      else if (hNorm === "RAW_DATA") fullRow.push(JSON.stringify(data));
-      else {
-        const key = hNorm.toLowerCase();
-        fullRow.push(catScores[key] || 0);
-      }
-    });
 
-    sheet.appendRow(fullRow);
-    const linkIdx = headers.indexOf("REPORT LINK");
-    if (linkIdx !== -1 && pdfUrl !== "N/A") {
-      sheet.getRange(sheet.getLastRow(), linkIdx + 1).setFormula('=HYPERLINK("' + pdfUrl + '", "View Report")');
-    }
+    const auditId = String(data.id);
+    const indexRow = [data.header.date, auditorId, auditorName, storeName, data.percentage + "%", pdfUrl, vaultUrl, auditId, JSON.stringify(data)];
     
-    updateSummaryTab(ss, tabName, data.header.date, data.percentage);
+    // Check if updating existing record in index
+    const indexData = indexSheet.getDataRange().getValues();
+    const idIdx = indexHeaders.indexOf("Record ID");
+    let existingRow = -1;
+    for (let i = 1; i < indexData.length; i++) {
+      if (indexData[i][idIdx] == auditId) { existingRow = i + 1; break; }
+    }
+    if (existingRow !== -1) indexSheet.getRange(existingRow, 1, 1, indexRow.length).setValues([indexRow]);
+    else indexSheet.appendRow(indexRow);
+
+    // 3. Update Store Specific Tab
+    let sheet = ss.getSheetByName(tabName) || ss.insertSheet(tabName);
+    let storeHeaders = ["Audit Date", "Auditor ID", "Final Score %", "REPORT LINK", "Record ID"];
+    if (sheet.getLastColumn() === 0) {
+      sheet.getRange(1, 1, 1, storeHeaders.length).setValues([storeHeaders]).setBackground("#0A0F1E").setFontColor("#C9A84C").setFontWeight("bold");
+    }
+    sheet.appendRow([data.header.date, auditorId, data.percentage + "%", pdfUrl, auditId]);
     
     return ContentService.createTextOutput(JSON.stringify({ status: "success", pdfLink: pdfUrl, vaultLink: vaultUrl }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -171,19 +152,20 @@ function doPost(e) {
   }
 }
 
-const MASTER_ARCHIVE_FOLDER = "RETAIL_AUDIT_DOCUMENTS";
-
-function archivePdfReport(base64, name, storeName) {
+function archivePdfReport(base64, name, auditorName, storeName) {
   let masterFolder = getFileByName(MASTER_ARCHIVE_FOLDER, "folder") || DriveApp.createFolder(MASTER_ARCHIVE_FOLDER);
   
-  const subFolderName = storeName || "General Reports";
+  // Auditor Folder
+  let auditorFolder;
+  const aFolders = masterFolder.getFoldersByName(auditorName);
+  if (aFolders.hasNext()) auditorFolder = aFolders.next();
+  else auditorFolder = masterFolder.createFolder(auditorName);
+
+  // Store Folder Inside Auditor Folder
   let storeFolder;
-  const folders = masterFolder.getFoldersByName(subFolderName);
-  if (folders.hasNext()) {
-    storeFolder = folders.next();
-  } else {
-    storeFolder = masterFolder.createFolder(subFolderName);
-  }
+  const sFolders = auditorFolder.getFoldersByName(storeName);
+  if (sFolders.hasNext()) storeFolder = sFolders.next();
+  else storeFolder = auditorFolder.createFolder(storeName);
   
   const bytes = Utilities.base64Decode(base64);
   const blob = Utilities.newBlob(bytes, MimeType.PDF, name);
@@ -192,10 +174,16 @@ function archivePdfReport(base64, name, storeName) {
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   storeFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   
-  return {
-    fileUrl: file.getUrl(),
-    folderUrl: storeFolder.getUrl()
-  };
+  return { fileUrl: file.getUrl(), folderUrl: storeFolder.getUrl() };
+}
+
+function getFileByName(name, type) {
+  const iterator = type === "spreadsheet" ? DriveApp.getFilesByName(name) : DriveApp.getFoldersByName(name);
+  while (iterator.hasNext()) {
+    const item = iterator.next();
+    if (!item.isTrashed()) return item;
+  }
+  return null;
 }
 
 function getFileByName(name, type) {

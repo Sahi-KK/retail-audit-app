@@ -56,5 +56,15 @@ export const googleSheetsService = {
       console.error("Fetch History Failed:", error);
       return [];
     }
+  },
+
+  fetchAuditDetail: async (auditId: string): Promise<any> => {
+    try {
+      const response = await fetch(`${CLOUD_SYNC_URL}?action=getAuditDetail&auditId=${auditId}`);
+      return await response.json();
+    } catch (error) {
+      console.error("Fetch Audit Detail Failed:", error);
+      return null;
+    }
   }
 };

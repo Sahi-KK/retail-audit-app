@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, FlatList, Pressable, TextInput, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { Search, FileText, ChevronRight, Calendar, Trash2, Pencil, Cloud, Smartphone, ExternalLink, RefreshCw } from 'lucide-react-native';
+import { Search, FileText, ChevronRight, Calendar, Trash2, Pencil, Cloud, Smartphone, ExternalLink, RefreshCw, DownloadCloud } from 'lucide-react-native';
 import { useAuditStore } from '../../store/auditStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Badge } from '../../components/Badge';
@@ -16,6 +16,7 @@ export default function GlobalHistoryScreen() {
   const [viewMode, setViewMode] = useState<'local' | 'cloud'>('local');
   const [cloudAudits, setCloudAudits] = useState<any[]>([]);
   const [isLoadingCloud, setIsLoadingCloud] = useState(false);
+  const [isSyncingAll, setIsSyncingAll] = useState(false);
 
   const filteredAudits = useMemo(() => {
     if (!completedAudits) return [];
@@ -35,29 +36,45 @@ export default function GlobalHistoryScreen() {
     });
   }, [completedAudits, search]);
 
-  const loadCloudHistory = async () => {
-    if (!auth.auditorId) {
-      Alert.alert("🚨 Debug: No Auditor ID", "Your profile is missing an ID. Please set it in the Profile tab.");
-      return;
-    }
+  const loadCloudHistory = async (silent = false) => {
+    if (!auth.auditorId) return;
     
-    setIsLoadingCloud(true);
+    if (!silent) setIsLoadingCloud(true);
     try {
-      console.log("Fetching history for:", auth.auditorId);
       const data = await googleSheetsService.fetchHistory(auth.auditorId);
-      
-      // DIAGNOSTIC POP-UP: Reveal the handshake
-      Alert.alert(
-        "🛰️ Ghost Hub Diagnostic",
-        `Searching for: [${auth.auditorId}]\n\nCloud Response: ${data.length} records found.\n\n${data.length === 0 ? "Potential ID mismatch in the Master Spreadsheet." : "Success! Signal clear."}`
-      );
-      
       setCloudAudits(data);
+      if (!silent) {
+        Alert.alert("🛰️ Ghost Hub", `${data.length} records retrieved from your Cloud Vault.`);
+      }
     } catch (e) {
-      Alert.alert("🚨 Debug: Hub Error", e instanceof Error ? e.message : "Unknown connectivity issue");
+      if (!silent) Alert.alert("Sync Error", "Failed to reach the Master Hub.");
     } finally {
-      setIsLoadingCloud(false);
+      if (!silent) setIsLoadingCloud(false);
     }
+  };
+
+  const syncAllFromCloud = async () => {
+    if (!auth.auditorId) return;
+    
+    Alert.alert(
+      "Deep Cloud Sync",
+      "This will scan the Global Index and refresh your history from the Cloud Vault. Continue?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Start Restore",
+          onPress: async () => {
+            setIsSyncingAll(true);
+            try {
+              await loadCloudHistory(true);
+              setViewMode('cloud');
+            } finally {
+              setIsSyncingAll(false);
+            }
+          }
+        }
+      ]
+    );
   };
 
   useEffect(() => {
@@ -294,7 +311,20 @@ export default function GlobalHistoryScreen() {
       <View className="bg-slate-900 rounded-b-[48px] shadow-xl overflow-hidden pb-8">
         <View className="px-6 pt-6">
           <View className="flex-row justify-between items-center mb-6">
-            <Text className="text-white text-2xl font-black">Audit History</Text>
+            <View className="flex-row items-center">
+              <Text className="text-white text-2xl font-black">Audit History</Text>
+              <Pressable 
+                onPress={syncAllFromCloud}
+                disabled={isSyncingAll}
+                className="ml-4 bg-white/10 p-2 rounded-xl active:scale-95"
+              >
+                {isSyncingAll ? (
+                  <ActivityIndicator size="small" color="#C9A84C" />
+                ) : (
+                  <DownloadCloud size={18} color="#C9A84C" />
+                )}
+              </Pressable>
+            </View>
             <View className="flex-row bg-white/10 p-1 rounded-2xl">
               <Pressable 
                 onPress={() => setViewMode('local')}
