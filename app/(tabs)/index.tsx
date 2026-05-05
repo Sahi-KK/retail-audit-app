@@ -103,44 +103,67 @@ export default function HomeDashboard() {
         </Pressable>
 
         <View className="flex-row gap-x-5">
-          <View className="flex-1 bg-white/5 rounded-[40px] p-8 border border-white/5 shadow-inner">
-            <Text className="text-white/40 text-[10px] font-medium uppercase tracking-[3px] mb-1">
-              {selectedStoreCode === 'ALL' ? 'Fleet Average' : 'Store Rating'}
-            </Text>
-            <Text className="text-white text-5xl font-semibold tracking-tighter">
-              {selectedStoreCode === 'ALL' ? `${activeScore}%` : (selectedStoreStats?.avgScore !== null ? `${activeScore}%` : 'N/A')}
-            </Text>
+          <View className="flex-1 bg-white/5 rounded-[40px] p-10 border border-white/10 shadow-inner items-center">
+            <View className="w-40 h-40 rounded-full border-8 border-[#C9A84C]/20 items-center justify-center relative">
+               <View 
+                 className="absolute w-40 h-40 rounded-full border-8 border-[#C9A84C]" 
+                 style={{ 
+                   borderLeftColor: 'transparent', 
+                   borderBottomColor: 'transparent',
+                   transform: [{ rotate: '45deg' }]
+                 }} 
+               />
+               <Text className="text-white text-6xl font-black tracking-tighter">
+                 {selectedStoreCode === 'ALL' ? `${activeScore}` : (selectedStoreStats?.avgScore !== null ? `${activeScore}` : 'N/A')}
+               </Text>
+               <Text className="text-white/40 text-[8px] font-black uppercase tracking-[3px] mt-1">% Compliance</Text>
+            </View>
+            <View className="mt-8">
+              <Text className="text-white/40 text-[9px] font-bold uppercase tracking-[4px] text-center">
+                {selectedStoreCode === 'ALL' ? 'Fleet Performance Index' : 'Local Compliance Rating'}
+              </Text>
+            </View>
           </View>
         </View>
 
         {/* Dynamic Category Heatmap */}
         {fleetStats.totalAudits > 0 && (
-          <View className="mt-10 bg-white/5 rounded-[40px] p-8 border border-white/5">
-            <View className="flex-row items-center mb-8">
-              <View className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-3 shadow-sm" />
-              <Text className="text-white/60 text-[10px] font-black uppercase tracking-[3px]">
-                {selectedStoreCode === 'ALL' ? 'Global Category Performance' : `${selectedStoreName} Metrics`}
+          <View className="mt-10 bg-black/20 rounded-[40px] p-10 border border-white/5">
+            <View className="flex-row items-center mb-10">
+              <View className="w-2 h-2 rounded-full bg-[#C9A84C] mr-4 shadow-lg shadow-gold/50" />
+              <Text className="text-white text-[11px] font-black uppercase tracking-[4px]">
+                {selectedStoreCode === 'ALL' ? 'FLEET CATEGORY HEATMAP' : 'STORE DIAGNOSTIC MAP'}
               </Text>
             </View>
             
-            <View className="gap-y-6">
+            <View className="gap-y-8">
               {( (activeCategoryStats as any) || []).map((cat: any) => {
                 const getBarColor = (p: number) => {
-                  if (p >= 85) return 'bg-emerald-500';
-                  if (p >= 70) return 'bg-amber-500';
-                  return 'bg-red-500';
+                  if (p >= 85) return '#10B981'; // Emerald
+                  if (p >= 70) return '#F59E0B'; // Amber
+                  return '#EF4444'; // Red
                 };
                 
                 return (
                   <View key={cat.category}>
-                    <View className="flex-row justify-between items-center mb-2.5">
-                      <Text className="text-white/40 text-[9px] font-bold uppercase tracking-widest">{cat.label}</Text>
-                      <Text className="text-white font-bold text-[10px]">{cat.percentage}%</Text>
+                    <View className="flex-row justify-between items-center mb-3">
+                      <Text className="text-white/40 text-[9px] font-black uppercase tracking-[2px]">{cat.label}</Text>
+                      <View className="flex-row items-center">
+                        <Text className="text-white font-black text-xs mr-1">{cat.percentage}</Text>
+                        <Text className="text-white/20 text-[8px] font-bold">%</Text>
+                      </View>
                     </View>
-                    <View className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <View className="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
                       <View 
-                        className={`h-full rounded-full ${getBarColor(cat.percentage)}`} 
-                        style={{ width: `${cat.percentage}%` }}
+                        className="h-full rounded-full" 
+                        style={{ 
+                          width: `${cat.percentage}%`,
+                          backgroundColor: getBarColor(cat.percentage),
+                          shadowColor: getBarColor(cat.percentage),
+                          shadowOffset: { width: 0, height: 0 },
+                          shadowOpacity: 0.5,
+                          shadowRadius: 10
+                        }}
                       />
                     </View>
                   </View>

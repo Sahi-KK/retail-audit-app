@@ -149,14 +149,14 @@ export default function GlobalHistoryScreen() {
                   {headerInfo.store || 'Standard Store'}
                 </Text>
                 {item.isSynced ? (
-                  <View className="ml-2 bg-emerald-50 px-2 py-0.5 rounded-full flex-row items-center">
+                  <View className="ml-2 bg-emerald-50 px-3 py-1 rounded-full flex-row items-center border border-emerald-100">
                     <Cloud size={10} color="#10B981" />
-                    <Text className="text-[8px] font-bold text-emerald-600 ml-1">SYNCED</Text>
+                    <Text className="text-[8px] font-black text-emerald-600 ml-1.5 uppercase tracking-widest">Vaulted</Text>
                   </View>
                 ) : (
-                  <View className="ml-2 bg-slate-50 px-2 py-0.5 rounded-full flex-row items-center">
+                  <View className="ml-2 bg-slate-50 px-3 py-1 rounded-full flex-row items-center border border-slate-100">
                     <Smartphone size={10} color="#94A3B8" />
-                    <Text className="text-[8px] font-bold text-slate-400 ml-1">LOCAL</Text>
+                    <Text className="text-[8px] font-black text-slate-400 ml-1.5 uppercase tracking-widest">Local</Text>
                   </View>
                 )}
               </View>
@@ -276,31 +276,25 @@ export default function GlobalHistoryScreen() {
   const renderCloudItem = ({ item }: { item: any }) => (
     <Pressable 
       onPress={() => handleCloudAction(item)}
-      className="bg-white rounded-[32px] p-6 mb-6 shadow-sm border border-slate-100 flex-row items-center active:opacity-80"
+      className="bg-white rounded-[40px] p-8 mb-6 shadow-sm border border-slate-100 flex-row items-center active:opacity-80 active:scale-[0.98]"
     >
-      <View className="w-12 h-12 bg-emerald-50 rounded-2xl items-center justify-center mr-4">
-        <Cloud size={24} color="#10B981" />
+      <View className="w-14 h-14 bg-slate-900 rounded-2xl items-center justify-center mr-5 shadow-lg">
+        <Cloud size={24} color="#C9A84C" />
       </View>
       <View className="flex-1">
-        <Text className="text-slate-900 font-bold text-base" numberOfLines={1}>{item.store}</Text>
-        <Text className="text-slate-400 text-xs mt-1">{new Date(item.date).toLocaleDateString()} • Synced Hub</Text>
+        <Text className="text-slate-900 font-black text-lg tracking-tight" numberOfLines={1}>{item.store}</Text>
+        <View className="flex-row items-center mt-1">
+          <Calendar size={10} color="#94A3B8" />
+          <Text className="text-slate-400 text-[10px] font-bold uppercase tracking-widest ml-1.5">
+            {new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} • SYNCED HUB
+          </Text>
+        </View>
       </View>
       <View className="items-end">
-        <Text className={`text-lg font-black ${getScoreColor(item.score)}`}>{item.score}</Text>
-        <View className="flex-row items-center gap-x-2 mt-1">
-          {item.link && item.link !== 'N/A' && (
-            <Pressable 
-              onPress={(e) => {
-                e.stopPropagation();
-                WebBrowser.openBrowserAsync(item.link);
-              }}
-              className="bg-emerald-100 p-1.5 rounded-lg"
-            >
-              <FileText size={14} color="#059669" />
-            </Pressable>
-          )}
-          <ChevronRight size={14} color="#94A3B8" />
+        <View className="bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 mb-2">
+          <Text className={`text-xl font-black ${getScoreColor(item.score)}`}>{item.score}</Text>
         </View>
+        <ChevronRight size={14} color="#CBD5E1" />
       </View>
     </Pressable>
   );
