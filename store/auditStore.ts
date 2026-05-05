@@ -12,6 +12,13 @@ export interface PhotoEvidence {
   timestamp: string;
 }
 
+export interface Terminology {
+  id: string;
+  word: string;
+  definition: string;
+  imageUri?: string;
+}
+
 export interface HeaderInfo {
   store: string;
   storeCode: string;
@@ -56,6 +63,7 @@ interface AuditStore {
   // History & Custom Data
   completedAudits: SavedAudit[];
   customStores: { name: string, code: string, brand: StoreBrand }[];
+  terminology: Terminology[];
   isReadOnly: boolean;
   
   // Actions
@@ -78,6 +86,10 @@ interface AuditStore {
   addCustomStore: (store: { name: string, code: string, brand: StoreBrand }) => void;
   deleteCustomStore: (code: string) => void;
   updateStore: (code: string, updatedStore: { name: string, code: string, brand: StoreBrand }) => void;
+  
+  // Terminology Management
+  addTerm: (term: Terminology) => void;
+  deleteTerm: (id: string) => void;
 }
 
 const DEFAULT_HEADER: HeaderInfo = {
@@ -106,6 +118,18 @@ export const useAuditStore = create<AuditStore>()(
       photos: [],
       completedAudits: [],
       customStores: [],
+      terminology: [
+        { id: '1', word: 'Planogram', definition: 'The corporate visual map for store layout and product placement. All stores must strictly follow the current issue.' },
+        { id: '2', word: 'NPI (New Product Introduction)', definition: 'High-priority launch models placed in prime eye-level zones to drive traffic and curiosity.' },
+        { id: '3', word: 'Acrylic Glorifier', definition: 'Premium lit display stands used to highlight key equity frames and campaign collections.' },
+        { id: '4', word: 'Celebration Table', definition: 'The primary front-of-store display featuring the current marketing campaign and alternative articles.' },
+        { id: '5', word: 'Tone of Voice', definition: 'The specific corporate language and brand messaging required during customer interaction to ensure premium status.' },
+        { id: '6', word: 'Ray-Ban Meta AI', definition: 'The smart eyewear collection featuring AI assistance, hands-free media capture, and live translation.' },
+        { id: '7', word: 'Clinical Pre-Test', definition: 'The initial patient diagnostic phase using sanitized equipment to ensure health standards and comfort.' },
+        { id: '8', word: 'Price Anchoring', definition: 'A sales technique where staff initiate conversations with the most premium option first to set a quality standard.' },
+        { id: '9', word: 'F.A.B.', definition: 'Features, Advantages, Benefits. The structured articulation used by associates to explain specific product value.' },
+        { id: '10', word: 'Omnichannel', definition: 'The integration of physical store presence with digital tools like iPads for Ship-to-Home orders.' }
+      ],
       isReadOnly: false,
       
       updateAuth: (name, id) => {
@@ -278,6 +302,18 @@ export const useAuditStore = create<AuditStore>()(
       updateStore: (code, updatedStore) => {
         set((state) => ({
           customStores: state.customStores.map(s => s.code === code ? updatedStore : s)
+        }));
+      },
+
+      addTerm: (term) => {
+        set((state) => ({
+          terminology: [term, ...state.terminology]
+        }));
+      },
+
+      deleteTerm: (id) => {
+        set((state) => ({
+          terminology: state.terminology.filter(t => t.id !== id)
         }));
       }
     }),

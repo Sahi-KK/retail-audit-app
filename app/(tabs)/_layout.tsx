@@ -74,6 +74,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <User size={22} color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="terminology"
+        options={{
+          title: 'Terminology',
+          href: null, // Hide from bottom bar
+        }}
+      />
     </Tabs>
   );
 }

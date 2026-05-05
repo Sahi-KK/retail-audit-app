@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import * as Updates from 'expo-updates';
+import { useRouter } from 'expo-router';
 import { useAuditStore } from '../../store/auditStore';
-import { User, ShieldCheck, Save, LogOut, ClipboardCheck } from 'lucide-react-native';
+import { User, ShieldCheck, Save, LogOut, ClipboardCheck, Book, ChevronRight } from 'lucide-react-native';
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { auth, updateAuth } = useAuditStore();
   
   const [name, setName] = useState(auth.auditorName);
@@ -148,6 +150,24 @@ export default function ProfileScreen() {
               </View>
             </View>
             <Text className="text-[#C9A84C] font-black text-[10px] tracking-widest">VERIFY</Text>
+          </Pressable>
+
+          <Pressable 
+            onPress={() => router.push('/terminology')}
+            className="bg-white/5 p-6 rounded-[30px] flex-row items-center justify-between border border-white/5 active:bg-white/10 mt-6"
+          >
+            <View className="flex-row items-center">
+              <View className="w-12 h-12 bg-[#C9A84C]/10 rounded-2xl items-center justify-center mr-4">
+                <Book size={24} color="#C9A84C" />
+              </View>
+              <View>
+                <Text className="text-white font-bold">Strategic Glossary</Text>
+                <Text className="text-slate-500 text-[10px] uppercase font-black tracking-widest mt-1">Operational Terminology</Text>
+              </View>
+            </View>
+            <View className="bg-[#C9A84C]/10 p-2 rounded-full">
+              <ChevronRight size={14} color="#C9A84C" />
+            </View>
           </Pressable>
         </View>
 
