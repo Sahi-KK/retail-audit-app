@@ -14,13 +14,48 @@ function authorize() {
 function doGet(e) {
   const action = e.parameter.action;
   const auditorId = (e.parameter.auditorId || "").trim();
+  const auditId = (e.parameter.auditId || "").trim();
 
   if (action === "getHistory") {
     return getAuditorHistory(auditorId);
   }
 
-  return ContentService.createTextOutput("🛡️ MASTER HUB ACTIVE | SEARCHING FOR: " + auditorId)
+  if (action === "getAuditDetail") {
+    return getAuditDetail(auditId);
+  }
+
+  return ContentService.createTextOutput("🛡️ MASTER HUB ACTIVE | TARGET ID: " + (auditorId || auditId))
     .setMimeType(ContentService.MimeType.TEXT);
+}
+
+function getAuditDetail(auditId) {
+  try {
+    const file = getFileByName(MASTER_FILE_NAME, "spreadsheet");
+    if (!file) return ContentService.createTextOutput(JSON.stringify({})).setMimeType(ContentService.MimeType.JSON);
+    
+    const ss = SpreadsheetApp.openById(file.getId());
+    const sheets = ss.getSheets();
+    
+    for (let sheet of sheets) {
+      if (sheet.getName() === "GLOBAL_SUMMARY") continue;
+      const data = sheet.getDataRange().getValues();
+      const headers = data[0];
+      const idIdx = headers.indexOf("Record ID");
+      const dataIdx = headers.indexOf("RAW_DATA");
+      
+      if (idIdx === -1 || dataIdx === -1) continue;
+      
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][idIdx].toString() === auditId) {
+          return ContentService.createTextOutput(data[i][dataIdx])
+            .setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({error: "Not Found"})).setMimeType(ContentService.MimeType.JSON);
+  } catch (e) {
+    return ContentService.createTextOutput(JSON.stringify({error: e.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 function getAuditorHistory(auditorId) {
@@ -39,16 +74,8 @@ function getAuditorHistory(auditorId) {
       if (data.length < 2) return;
       
       const headers = data[0];
-      // SMART SEARCH: Handles formatting variations
       const audIdIdx = headers.findIndex(h => h.toString().replace(/\s/g, '').toLowerCase() === "auditorid");
-      
-      // Look for PDF Link with multiple possible header names
-      const linkHeaders = ["REPORT LINK", "LINK", "URL", "PDF URL", "GOOGLE DRIVE LINK"];
-      const linkIdx = headers.findIndex(h => {
-        const hClean = h.toString().trim().toUpperCase();
-        return linkHeaders.includes(hClean) || hClean.includes("LINK") || hClean.includes("URL");
-      });
-
+      const linkIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("LINK"));
       const dateIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("DATE"));
       const scoreIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("SCORE"));
       const recordIdIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("RECORD ID"));
@@ -59,10 +86,10 @@ function getAuditorHistory(auditorId) {
         const rowId = (data[i][audIdIdx] || "").toString().trim();
         if (rowId === auditorId) {
           history.push({
-            id: recordIdIdx !== -1 ? data[i][recordIdIdx] : (data[i][headers.indexOf("Record ID")] || i),
-            date: dateIdx !== -1 ? data[i][dateIdx] : data[i][headers.indexOf("Audit Date")],
+            id: recordIdIdx !== -1 ? data[i][recordIdIdx] : i,
+            date: dateIdx !== -1 ? data[i][dateIdx] : "N/A",
             store: sheet.getName(),
-            score: scoreIdx !== -1 ? data[i][scoreIdx] : data[i][headers.indexOf("Final Score %")],
+            score: scoreIdx !== -1 ? data[i][scoreIdx] : "0%",
             link: linkIdx !== -1 ? data[i][linkIdx] : "N/A",
             timestamp: new Date(data[i][dateIdx] || Date.now()).getTime()
           });
@@ -85,27 +112,23 @@ function doPost(e) {
     const storeName = data.header.store || "Unknown Store";
     const tabName = storeCode + " - " + storeName.substring(0, 15);
     
-    // 1. Spreadsheet Management
     let file = getFileByName(MASTER_FILE_NAME, "spreadsheet");
     let ss = file ? SpreadsheetApp.openById(file.getId()) : SpreadsheetApp.create(MASTER_FILE_NAME);
     
-    // 2. PDF Management (Generates Link)
     let pdfUrl = "N/A";
     if (payload.pdfBase64) {
       pdfUrl = archivePdfReport(payload.pdfBase64, storeName + "_" + storeCode + "_" + Date.now() + ".pdf", storeName);
     }
     
-    // 3. Tab & Column Auto-Healing
     let sheet = ss.getSheetByName(tabName) || ss.insertSheet(tabName);
     let headers = sheet.getLastColumn() > 0 ? sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0] : [];
     
-    // If layout is old/empty, force the standard headers
-    if (headers.indexOf("Auditor ID") === -1) {
-      headers = ["Audit Date", "Auditor ID", "Auditor Name", "Final Score %", "Total Points", "Cleanliness", "Merchandising", "Operations", "Staff", "Clinical", "REPORT LINK", "Record ID"];
+    // Auto-Healing Headers with RAW_DATA support
+    if (headers.indexOf("RAW_DATA") === -1) {
+      headers = ["Audit Date", "Auditor ID", "Auditor Name", "Final Score %", "Total Points", "Cleanliness", "Merchandising", "Operations", "Staff", "Clinical", "REPORT LINK", "Record ID", "RAW_DATA"];
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setBackground("#0A0F1E").setFontColor("#C9A84C").setFontWeight("bold");
     }
     
-    // 4. Construct Row Data
     const auditId = String(data.id);
     const catScores = data.categoryBreakdown || {};
     const fullRow = [];
@@ -118,21 +141,19 @@ function doPost(e) {
       else if (hNorm === "Total Points") fullRow.push(data.earned + " / " + data.total);
       else if (hNorm === "REPORT LINK") fullRow.push(pdfUrl);
       else if (hNorm === "Record ID") fullRow.push(auditId);
+      else if (hNorm === "RAW_DATA") fullRow.push(JSON.stringify(data));
       else {
-        // Map category scores
         const key = hNorm.toLowerCase();
         fullRow.push(catScores[key] || 0);
       }
     });
 
-    // 5. Append & Linkify
     sheet.appendRow(fullRow);
     const linkIdx = headers.indexOf("REPORT LINK");
     if (linkIdx !== -1 && pdfUrl !== "N/A") {
       sheet.getRange(sheet.getLastRow(), linkIdx + 1).setFormula('=HYPERLINK("' + pdfUrl + '", "View Report")');
     }
     
-    // 6. Update Summary
     updateSummaryTab(ss, tabName, data.header.date, data.percentage);
     
     return ContentService.createTextOutput(JSON.stringify({ status: "success", pdfLink: pdfUrl }))

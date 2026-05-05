@@ -207,15 +207,23 @@ export default function GlobalHistoryScreen() {
           onPress: async () => {
             setIsLoadingCloud(true);
             try {
-              const response = await fetch(`${googleSheetsService.CLOUD_SYNC_URL}?action=getAuditDetail&auditId=${item.id}`);
+              const url = `${googleSheetsService.CLOUD_SYNC_URL}?action=getAuditDetail&auditId=${item.id}`;
+              console.log("Retrieving full data from:", url);
+              const response = await fetch(url);
               const fullAudit = await response.json();
+              
               if (fullAudit && fullAudit.id) {
                 const { loadAudit } = useAuditStore.getState();
                 loadAudit(fullAudit);
                 router.push("/(audit)/cleanliness");
+              } else {
+                throw new Error(fullAudit.error || "Audit not found in cloud vault.");
               }
             } catch (e) {
-              Alert.alert("Error", "Failed to retrieve full audit data.");
+              Alert.alert(
+                "Retrieve Failed", 
+                "This audit was likely saved with an older version of the script. Only new audits saved from today onwards can be 'Opened in App'."
+              );
             } finally {
               setIsLoadingCloud(false);
             }
@@ -224,8 +232,10 @@ export default function GlobalHistoryScreen() {
         { 
           text: "View PDF Report", 
           onPress: () => {
-            if (item.link && item.link !== 'N/A') {
-              WebBrowser.openBrowserAsync(item.link);
+            const reportUrl = item.link || item.pdfLink;
+            if (reportUrl && reportUrl !== 'N/A') {
+              console.log("Opening Report:", reportUrl);
+              WebBrowser.openBrowserAsync(reportUrl);
             } else {
               Alert.alert("Legacy Audit", "This audit was recorded before the Cloud PDF feature was active.");
             }
