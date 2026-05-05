@@ -3,13 +3,13 @@
   "main": "expo-router/entry",
   "version": "2.3.0",
   "scripts": {
-    "start": "expo start",
-    "dev": "expo start --dev-client",
+    "start": "EXPO_NO_TELEMETRY=1 expo start",
+    "dev": "EXPO_NO_TELEMETRY=1 expo start --dev-client",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "lint": "expo lint",
+    "android": "EXPO_NO_TELEMETRY=1 expo start --android",
+    "ios": "EXPO_NO_TELEMETRY=1 expo start --ios",
+    "web": "EXPO_NO_TELEMETRY=1 expo start --web",
+    "lint": "EXPO_NO_TELEMETRY=1 expo lint",
     "build:android": "npx eas-cli build --platform android --profile preview --non-interactive"
   },
   "dependencies": {

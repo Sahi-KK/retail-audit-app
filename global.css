@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Force pointer-events on the root to avoid invisible overlays */
+  #root > div {
+    pointer-events: auto !important;
+  }
+
+  /* Ensure the max-width container is interactive */
+  [data-testid="root-container"] {
+    pointer-events: auto !important;
+  }
+}

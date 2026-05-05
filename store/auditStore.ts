@@ -35,7 +35,7 @@ export interface SavedAudit {
   completedAt: string;
   isDraft: boolean;
   isSynced?: boolean;
-  cloudFileId?: string;
+  cloudFileUrl?: string;
 }
 
 interface AuditStore {
@@ -67,7 +67,7 @@ interface AuditStore {
   loadAudit: (audit: SavedAudit) => void;
   setReadOnly: (val: boolean) => void;
   submitAudit: (stats: { percentage: number, earned: number, total: number }) => void;
-  markAsSynced: (auditId: string, cloudFileId?: string) => void;
+  markAsSynced: (auditId: string, cloudFileUrl?: string) => void;
   deleteAudit: (auditId: string) => void;
   resetAudit: () => void;
   
@@ -213,10 +213,10 @@ export const useAuditStore = create<AuditStore>()(
         });
       },
 
-      markAsSynced: (auditId, cloudFileId) => {
+      markAsSynced: (auditId, cloudFileUrl) => {
         set((state) => ({
           completedAudits: state.completedAudits.map(a => 
-            a.id === auditId ? { ...a, isSynced: true, cloudFileId } : a
+            a.id === auditId ? { ...a, isSynced: true, cloudFileUrl } : a
           )
         }));
       },

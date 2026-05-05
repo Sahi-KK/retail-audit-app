@@ -41,9 +41,17 @@ function getAuditorHistory(auditorId) {
       const headers = data[0];
       // SMART SEARCH: Handles formatting variations
       const audIdIdx = headers.findIndex(h => h.toString().replace(/\s/g, '').toLowerCase() === "auditorid");
-      const linkIdx = headers.indexOf("REPORT LINK");
-      const dateIdx = headers.indexOf("Audit Date");
-      const scoreIdx = headers.indexOf("Final Score %");
+      
+      // Look for PDF Link with multiple possible header names
+      const linkHeaders = ["REPORT LINK", "LINK", "URL", "PDF URL", "GOOGLE DRIVE LINK"];
+      const linkIdx = headers.findIndex(h => {
+        const hClean = h.toString().trim().toUpperCase();
+        return linkHeaders.includes(hClean) || hClean.includes("LINK") || hClean.includes("URL");
+      });
+
+      const dateIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("DATE"));
+      const scoreIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("SCORE"));
+      const recordIdIdx = headers.findIndex(h => h.toString().trim().toUpperCase().includes("RECORD ID"));
       
       if (audIdIdx === -1) return;
 
@@ -51,12 +59,12 @@ function getAuditorHistory(auditorId) {
         const rowId = (data[i][audIdIdx] || "").toString().trim();
         if (rowId === auditorId) {
           history.push({
-            id: data[i][headers.indexOf("Record ID")] || i,
-            date: data[i][dateIdx],
+            id: recordIdIdx !== -1 ? data[i][recordIdIdx] : (data[i][headers.indexOf("Record ID")] || i),
+            date: dateIdx !== -1 ? data[i][dateIdx] : data[i][headers.indexOf("Audit Date")],
             store: sheet.getName(),
-            score: data[i][scoreIdx],
-            link: data[i][linkIdx],
-            timestamp: new Date(data[i][dateIdx]).getTime()
+            score: scoreIdx !== -1 ? data[i][scoreIdx] : data[i][headers.indexOf("Final Score %")],
+            link: linkIdx !== -1 ? data[i][linkIdx] : "N/A",
+            timestamp: new Date(data[i][dateIdx] || Date.now()).getTime()
           });
         }
       }

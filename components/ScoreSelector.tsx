@@ -56,8 +56,8 @@ function ScorePill({ value, isSelected, onPress, disabled }: ScorePillProps) {
         if (disabled) return;
         onPress();
       }}
-      className={`flex-1 items-center justify-center py-2 rounded-2xl mx-1 ${
-        disabled && !isSelected ? 'opacity-30' : ''
+      className={`flex-1 items-center justify-center py-2 rounded-2xl mx-1 transition-all duration-200 ${
+        disabled && !isSelected ? 'opacity-30' : 'web:hover:bg-slate-200/50'
       }`}
     >
       <Animated.View 

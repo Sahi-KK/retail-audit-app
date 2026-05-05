@@ -18,15 +18,22 @@ export function PhotoEvidence() {
   const [draftTag, setDraftTag] = useState<'positive' | 'negative' | null>(null);
 
   const takePhoto = async () => {
-    if (!status?.granted) {
-      const p = await requestPermission();
-      if (!p.granted) return;
+    // WEB SPECIFIC: Skip permission checks as the browser handles file picking through a dialog
+    if (Platform.OS !== 'web') {
+      if (!status?.granted) {
+        const p = await requestPermission();
+        if (!p.granted) return;
+      }
     }
 
-    const result = await ImagePicker.launchCameraAsync({
+    const pickerOptions: ImagePicker.ImagePickerOptions = {
       mediaTypes: ['images'],
       quality: 0.5,
-    });
+    };
+
+    const result = Platform.OS === 'web' 
+      ? await ImagePicker.launchImageLibraryAsync(pickerOptions)
+      : await ImagePicker.launchCameraAsync(pickerOptions);
 
     if (!result.canceled && result.assets[0]) {
       setEditingId(null);

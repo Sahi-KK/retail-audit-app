@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Modal, Pressable, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Modal, Pressable, ScrollView, Alert, ActivityIndicator, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
@@ -85,14 +85,18 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       
       for (const photo of photos) {
         try {
-          const info = await FileSystem.getInfoAsync(photo.uri);
-          if (!info.exists) {
-            console.warn(`Photo not found at URI: ${photo.uri}`);
-            continue;
+          let imgSrc = photo.uri;
+          
+          if (Platform.OS !== 'web') {
+            const info = await FileSystem.getInfoAsync(photo.uri);
+            if (!info.exists) {
+              console.warn(`Photo not found at URI: ${photo.uri}`);
+              continue;
+            }
+            const base64Str = await FileSystem.readAsStringAsync(photo.uri, { encoding: 'base64' });
+            imgSrc = `data:image/jpeg;base64,${base64Str}`;
           }
 
-          const base64Str = await FileSystem.readAsStringAsync(photo.uri, { encoding: 'base64' });
-          const imgSrc = `data:image/jpeg;base64,${base64Str}`;
           const badgeColor = photo.tag === 'positive' ? '#10B981' : '#EF4444';
           const badgeText = photo.tag === 'positive' ? 'POSITIVE (+)' : 'NEGATIVE (-)';
 
@@ -205,11 +209,15 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       const finalId = activeAuditId || Date.now().toString();
       const html = await generateHtml();
       
-      const { uri, base64 } = await Print.printToFileAsync({ 
-        html,
-        base64: true 
-      });
-      setPdfUri(uri);
+      let base64 = null;
+      if (Platform.OS !== 'web') {
+        const result = await Print.printToFileAsync({ 
+          html,
+          base64: true 
+        });
+        setPdfUri(result.uri);
+        base64 = result.base64;
+      }
 
       // GHOST SHIELD: Increased limit to 45MB (Google Apps Script limit is 50MB)
       const isTooLarge = base64 && base64.length > 45 * 1024 * 1024;
@@ -266,10 +274,17 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
 
   const handleShare = async () => {
     try {
+      const html = await generateHtml();
+      
+      if (Platform.OS === 'web') {
+        // Web: Direct browser print (which allows "Save as PDF")
+        await Print.printAsync({ html });
+        return;
+      }
+
       let currentUri = pdfUri;
       if (!currentUri) {
         Alert.alert("Processing", "Generating report, please wait...");
-        const html = await generateHtml();
         const { uri } = await Print.printToFileAsync({ html });
         currentUri = uri;
         setPdfUri(uri);
@@ -318,7 +333,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
         // However, submitAudit creates a NEW entry. 
         // We should probably mark the most recent one as synced if it matches finalId
         const { markAsSynced } = useAuditStore.getState();
-        markAsSynced(finalId);
+        markAsSynced(finalId, (syncResult as any).pdfLink);
         onClose();
         router.replace('/');
       }

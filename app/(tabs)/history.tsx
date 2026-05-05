@@ -172,6 +172,16 @@ export default function GlobalHistoryScreen() {
              </Pressable>
            </View>
 
+           {item.isSynced && (item as any).cloudFileUrl && (
+              <Pressable 
+                onPress={() => WebBrowser.openBrowserAsync((item as any).cloudFileUrl)}
+                className="flex-row items-center bg-slate-900 px-5 py-2.5 rounded-2xl shadow-sm active:scale-95"
+              >
+                <FileText size={14} color="#C9A84C" />
+                <Text className="ml-2 text-[10px] font-black uppercase tracking-widest text-gold">View Report</Text>
+              </Pressable>
+           )}
+
            {!item.isSynced && (
               <Pressable 
                 onPress={() => handleSyncItem(item)}
@@ -186,9 +196,48 @@ export default function GlobalHistoryScreen() {
     );
   };
 
+  const handleCloudAction = (item: any) => {
+    Alert.alert(
+      "Cloud Command",
+      `Store: ${item.store}\n\nSelect an operation for this cloud record.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Open in App (Edit)", 
+          onPress: async () => {
+            setIsLoadingCloud(true);
+            try {
+              const response = await fetch(`${googleSheetsService.CLOUD_SYNC_URL}?action=getAuditDetail&auditId=${item.id}`);
+              const fullAudit = await response.json();
+              if (fullAudit && fullAudit.id) {
+                const { loadAudit } = useAuditStore.getState();
+                loadAudit(fullAudit);
+                router.push("/(audit)/cleanliness");
+              }
+            } catch (e) {
+              Alert.alert("Error", "Failed to retrieve full audit data.");
+            } finally {
+              setIsLoadingCloud(false);
+            }
+          } 
+        },
+        { 
+          text: "View PDF Report", 
+          onPress: () => {
+            if (item.link && item.link !== 'N/A') {
+              WebBrowser.openBrowserAsync(item.link);
+            } else {
+              Alert.alert("Legacy Audit", "This audit was recorded before the Cloud PDF feature was active.");
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const renderCloudItem = ({ item }: { item: any }) => (
     <Pressable 
-      onPress={() => WebBrowser.openBrowserAsync(item.link)}
+      onPress={() => handleCloudAction(item)}
       className="bg-white rounded-[32px] p-6 mb-6 shadow-sm border border-slate-100 flex-row items-center active:opacity-80"
     >
       <View className="w-12 h-12 bg-emerald-50 rounded-2xl items-center justify-center mr-4">
@@ -200,7 +249,20 @@ export default function GlobalHistoryScreen() {
       </View>
       <View className="items-end">
         <Text className={`text-lg font-black ${getScoreColor(item.score)}`}>{item.score}</Text>
-        <ExternalLink size={14} color="#94A3B8" />
+        <View className="flex-row items-center gap-x-2 mt-1">
+          {item.link && item.link !== 'N/A' && (
+            <Pressable 
+              onPress={(e) => {
+                e.stopPropagation();
+                WebBrowser.openBrowserAsync(item.link);
+              }}
+              className="bg-emerald-100 p-1.5 rounded-lg"
+            >
+              <FileText size={14} color="#059669" />
+            </Pressable>
+          )}
+          <ChevronRight size={14} color="#94A3B8" />
+        </View>
       </View>
     </Pressable>
   );

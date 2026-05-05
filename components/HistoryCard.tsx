@@ -1,6 +1,4 @@
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { ChevronRight, Calendar, MapPin, User, Cloud, CloudOff } from 'lucide-react-native';
+import * as WebBrowser from 'expo-web-browser';
 import { SavedAudit } from '../store/auditStore';
 
 interface HistoryCardProps {
@@ -64,12 +62,23 @@ export function HistoryCard({ audit, onPress }: HistoryCardProps) {
         
         <View className="flex-row items-center">
           {audit.isSynced ? (
-            <Text className="text-emerald-500/60 font-black text-[8px] uppercase tracking-widest mr-3">Vaulted</Text>
+            <Pressable 
+              onPress={(e) => {
+                e.stopPropagation();
+                if (audit.cloudFileUrl) WebBrowser.openBrowserAsync(audit.cloudFileUrl);
+              }}
+              className="flex-row items-center"
+            >
+              <Text className="text-emerald-500 font-black text-[8px] uppercase tracking-widest mr-2">Vaulted</Text>
+              <Text className="text-navy font-semibold text-xs mr-1 opacity-40">View Report</Text>
+              <ChevronRight size={14} color="#0A0F1E" opacity={0.3} />
+            </Pressable>
           ) : (
-            <Text className="text-rose-500/60 font-black text-[8px] uppercase tracking-widest mr-3">Local Only</Text>
+            <View className="flex-row items-center">
+              <Text className="text-rose-500/60 font-black text-[8px] uppercase tracking-widest mr-3">Local Only</Text>
+              <ChevronRight size={14} color="#0A0F1E" opacity={0.3} />
+            </View>
           )}
-          <Text className="text-navy font-semibold text-xs mr-1 opacity-40">View Report</Text>
-          <ChevronRight size={14} color="#0A0F1E" opacity={0.3} />
         </View>
       </View>
     </Pressable>

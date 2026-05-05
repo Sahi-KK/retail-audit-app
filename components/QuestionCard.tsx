@@ -16,7 +16,7 @@ export function QuestionCard({ question, index }: QuestionCardProps) {
   const { isReadOnly } = useScoreCalc();
 
   return (
-    <View className="mb-8 bg-white rounded-[40px] shadow-sm border border-slate-100 overflow-hidden">
+    <View className="mb-8 bg-white rounded-[40px] shadow-sm border border-slate-100 overflow-hidden transition-colors duration-300 web:hover:border-slate-200">
       <View className="p-8">
         <View className="flex-row justify-between items-center mb-6">
           <View className="bg-slate-900 px-4 py-1.5 rounded-full">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, Dimensions, Modal, Pressable } from 'react-native';
+import { View, Text, ScrollView, Dimensions, Modal, Pressable, TouchableOpacity } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import { TrendingUp, Crown, AlertTriangle, ChevronDown, CheckCircle2, AlertCircle, X, ClipboardCheck, ArrowRight, Plus } from 'lucide-react-native';
 import { useScoreCalc } from '../../hooks/useScoreCalc';
@@ -68,12 +68,26 @@ export default function HomeDashboard() {
             <Text className="text-slate-400 text-[10px] font-medium uppercase tracking-[4px] mb-2">Regional Intelligence</Text>
             <Text className="text-white text-4xl font-semibold tracking-tighter">Strategic Hub</Text>
           </View>
-          <Pressable 
-            onPress={() => handleLaunchAudit()}
-            className="bg-[#C9A84C] p-4 rounded-2xl shadow-lg active:scale-95"
+          <TouchableOpacity 
+            onPress={() => {
+              console.log("[DEBUG] Plus button clicked (Pure Style)");
+              handleLaunchAudit();
+            }}
+            activeOpacity={0.7}
+            style={{
+              backgroundColor: '#C9A84C',
+              padding: 16,
+              borderRadius: 16,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 5,
+              zIndex: 100,
+            }}
           >
             <Plus size={24} color="#0A0F1E" strokeWidth={3} />
-          </Pressable>
+          </TouchableOpacity>
         </View>
 
         {/* Global Filter Pill (Relocated to Header) */}

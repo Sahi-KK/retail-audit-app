@@ -46,10 +46,10 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               <Pressable
                 key={route.key}
                 onPress={() => navigation.navigate(route.name)}
-                className={`px-6 py-3.5 rounded-2xl flex-row items-center border ${
+                className={`px-6 py-3.5 rounded-2xl flex-row items-center border transition-all duration-200 ${
                   isFocused 
                     ? 'bg-slate-900 border-slate-900 shadow-md' 
-                    : 'bg-white border-slate-100'
+                    : 'bg-white border-slate-100 active:bg-slate-50 web:hover:border-slate-300'
                 }`}
               >
                 <Text className={`text-[10px] font-black uppercase tracking-widest ${

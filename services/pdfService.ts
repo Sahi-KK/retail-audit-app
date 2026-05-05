@@ -1,5 +1,6 @@
 import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
+import { Platform } from 'react-native';
 
 export interface AuditReportData {
   id: string;
@@ -98,6 +99,10 @@ export const pdfService = {
         </body>
       </html>
     `;
+
+    if (Platform.OS === 'web') {
+      return html;
+    }
 
     try {
       // 1. Generate PDF file
