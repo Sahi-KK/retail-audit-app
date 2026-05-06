@@ -10,7 +10,7 @@ To start the primary user interface:
     ```bash
     npm run dev
     ```
-4.  Open your browser to: **http://localhost:5173**
+4.  Open your browser to: **http://localhost:5073**
 
 ---
 
@@ -35,7 +35,21 @@ Once logged in, the **Strategic Hub** will automatically filter all stats, chart
 
 ---
 
-## 📂 4. Where is my Data?
+## 🌐 5. Official Live Enterprise URL
+For access outside of your local environment (mobile, tablet, or remote desktop), use the official live hub:
+
+**Live Link:** [https://sahi-kk.github.io/retail-audit-app/](https://sahi-kk.github.io/retail-audit-app/)
+
+### 🏷️ Professional Re-branding (Custom Domain)
+To remove the "github" naming and use a professional domain (e.g., `audit.luxottica.com`):
+1.  **Purchase Domain**: Acquire your preferred domain from a registrar.
+2.  **GitHub Config**: Go to Repository Settings -> Pages -> Custom Domain.
+3.  **DNS Update**: Add a **CNAME** record in your domain dashboard pointing to `sahi-kk.github.io`.
+
+---
+
+## 📂 6. Where is my Data?
 - **Browser Storage**: Audits are instantly cached in your browser's local storage for offline access.
-- **Cloud Vault**: Every time you click "Complete Audit", a JSON report is transmitted to:
-  `/Applications/Antigravitty/EssilorLuxottice - Audit App/web-portal/cloud_vault/`
+- **Master Cloud Hub**: High-fidelity PDF reports and data are synced to your **Google Drive Master Vault** and the **Global Index Spreadsheet**.
+- **Local Cloud Vault**: A backup JSON report is also transmitted to the local `/cloud_vault/` directory if the sync server is running.
+
