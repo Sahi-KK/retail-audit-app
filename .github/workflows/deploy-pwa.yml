@@ -1,4 +1,4 @@
-name: "Ghost Pulse: Unified Web Deployment (PWA)"
+name: "Enterprise Portal: Live Deployment"
 
 on:
   push:
@@ -19,24 +19,20 @@ jobs:
           node-version: 22
           cache: 'npm'
 
-      - name: 📦 Restore node_modules cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: 📦 Install Dependencies
-        run: npm ci --prefer-offline --no-audit
-
-      - name: 🛠️ Build PWA Core
+      - name: 📦 Install Portal Dependencies
         run: |
-          npx expo export --platform web --output-dir dist
+          cd web-portal
+          npm ci --prefer-offline --no-audit
+
+      - name: 🛠️ Build Enterprise Bundle
+        run: |
+          cd web-portal
+          npm run build
           touch dist/.nojekyll
 
-      - name: 🚀 Deploy to GitHub Pages
+      - name: 🚀 Deploy to Live URL
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist
+          folder: web-portal/dist
           branch: gh-pages
+
