@@ -21,7 +21,7 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/retail-audit-app">
       <div className="min-h-screen bg-[#F4F4F6] font-sans">
         <Routes>
           <Route path="/login" element={<Login />} />
