@@ -9,6 +9,7 @@ import ReportDetail from './pages/ReportDetail';
 import Stores from './pages/Stores';
 import Profile from './pages/Profile';
 import ManageStores from './pages/ManageStores';
+import Terminology from './pages/Terminology';
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const auth = useAuditStore(state => state.auth);
@@ -42,6 +43,11 @@ function App() {
           <Route path="/profile" element={
             <AuthGuard>
               <Profile />
+            </AuthGuard>
+          } />
+          <Route path="/terminology" element={
+            <AuthGuard>
+              <Terminology />
             </AuthGuard>
           } />
           <Route path="/manage-stores" element={

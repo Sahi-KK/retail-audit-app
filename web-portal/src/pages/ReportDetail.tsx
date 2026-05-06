@@ -20,13 +20,16 @@ const ReportDetail = () => {
     );
   }
 
-  const categoryOrder = ['cleanliness', 'merchandising', 'operations', 'staff', 'rayban_meta'];
+  const isLensCrafters = audit.headerInfo.storeBrand === 'LensCrafters';
+  const categoryOrder = ['cleanliness', 'merchandising', 'operations', 'staff', 'rayban_meta', ...(isLensCrafters ? ['clinical'] : [])];
+  
   const categoryLabels: Record<string, string> = {
     cleanliness: 'CLEANLINESS & HYGIENE',
     merchandising: 'VISUAL MERCHANDISING & BRAND INTEGRITY',
     operations: 'STORE OPERATIONS & ASSET PROTECTION',
     staff: 'STAFF BEHAVIOUR & CUSTOMER EXPERIENCE',
-    rayban_meta: 'RAY-BAN META EXCELLENCE'
+    rayban_meta: 'RAY-BAN META EXCELLENCE',
+    clinical: 'LENSCRAFTERS CLINICAL OPERATIONS'
   };
 
   return (
@@ -43,7 +46,7 @@ const ReportDetail = () => {
         </button>
       </div>
 
-      {/* THE ACTUAL REPORT (MATCHING SCREENSHOTS) */}
+      {/* THE ACTUAL REPORT */}
       <div className="max-w-[850px] mx-auto bg-white p-[60px] text-[#1e293b] font-sans shadow-2xl print:shadow-none print:w-full print:p-[40px]">
         
         {/* Header Section */}
@@ -53,13 +56,13 @@ const ReportDetail = () => {
               <div className="space-y-1.5 text-[14px]">
                  <p><span className="font-bold text-slate-400">Brand:</span> <span className="font-bold text-slate-700">{audit.headerInfo.storeBrand}</span></p>
                  <p><span className="font-bold text-slate-400">Store:</span> <span className="font-bold text-slate-700">{audit.headerInfo.storeCode} - {audit.headerInfo.store.split(',')[0]}</span></p>
-                 <p><span className="font-bold text-slate-400">Auditor:</span> <span className="font-bold text-slate-700">{audit.headerInfo.auditorName || 'Krishnakant Singh'}</span></p>
+                 <p><span className="font-bold text-slate-400">Auditor:</span> <span className="font-bold text-slate-700">{audit.headerInfo.auditorName}</span></p>
                  <p><span className="font-bold text-slate-400">Date:</span> <span className="font-bold text-slate-700">{audit.headerInfo.date}</span></p>
               </div>
            </div>
            <div className="pt-8">
-              {/* Mock Logo */}
-              <div className="text-slate-300 font-serif italic text-xl opacity-40">Centralia</div>
+              <div className="text-[#C9A84C] font-black text-xl italic tracking-tighter">ESSILORLUXOTTICA</div>
+              <div className="text-slate-300 text-[8px] font-black uppercase tracking-[3px] mt-1 text-right">Strategic Hub v3.1</div>
            </div>
         </div>
 
@@ -67,16 +70,17 @@ const ReportDetail = () => {
         <div className="h-[3px] bg-[#C9A84C] w-full mb-12" />
 
         {/* Hero Score Box */}
-        <div className="bg-[#0f172a] rounded-[32px] p-[50px] text-center mb-20 shadow-xl">
-           <p className="text-white/40 text-[11px] font-black uppercase tracking-[5px] mb-6">FINAL AUDIT SCORE</p>
-           <h2 className="text-[90px] font-[900] text-[#C9A84C] leading-none mb-6">{audit.finalPercentage}%</h2>
-           <p className="text-white text-[14px] font-bold uppercase tracking-[2px]">{audit.finalScore} / {audit.totalMax} TOTAL POINTS EARNED</p>
+        <div className="bg-[#0f172a] rounded-[32px] p-[50px] text-center mb-20 shadow-xl relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-48 h-48 bg-[#C9A84C]/5 rounded-full blur-[60px] -mr-24 -mt-24" />
+           <p className="text-white/40 text-[11px] font-black uppercase tracking-[5px] mb-6 relative z-10">Compliance Index</p>
+           <h2 className="text-[90px] font-[900] text-[#C9A84C] leading-none mb-6 relative z-10">{audit.finalPercentage}%</h2>
+           <p className="text-white text-[14px] font-bold uppercase tracking-[2px] relative z-10">{audit.finalScore} / {audit.totalMax} TOTAL POINTS EARNED</p>
         </div>
 
         {/* Detailed Category Scoring */}
         <div className="mb-12 flex items-center gap-4">
-           <div className="w-[6px] h-8 bg-[#C9A84C]" />
-           <h3 className="text-[24px] font-[900] text-[#0f172a]">Detailed Category Scoring</h3>
+           <div className="w-[6px] h-8 bg-[#C9A84C] rounded-full" />
+           <h3 className="text-[24px] font-[900] text-[#0f172a] italic uppercase tracking-tight">Performance Metrics</h3>
         </div>
 
         <div className="space-y-12">
@@ -92,19 +96,34 @@ const ReportDetail = () => {
               });
 
               return (
-                <div key={catKey} className="rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+                <div key={catKey} className="rounded-2xl overflow-hidden border border-slate-100 shadow-sm page-break-inside-avoid">
                    <div className="bg-[#0f172a] px-6 py-4">
                       <h4 className="text-[#C9A84C] text-[12px] font-black tracking-[2px] uppercase">{categoryLabels[catKey]}</h4>
                    </div>
                    <div className="divide-y divide-slate-100">
-                      {catQuestions.map((q, idx) => (
-                        <div key={q.id} className={`flex justify-between items-center px-6 py-4 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}`}>
-                           <p className="text-[11px] font-bold text-slate-500 leading-relaxed pr-8 max-w-[80%]">{q.text}</p>
-                           <p className="text-[13px] font-black text-slate-800 whitespace-nowrap">{audit.scores[q.id] || 0} / 5</p>
-                        </div>
-                      ))}
+                      {catQuestions.map((q, idx) => {
+                        const score = audit.scores[q.id] || 0;
+                        const remark = audit.remarks?.[q.id];
+                        return (
+                          <div key={q.id} className={`px-6 py-6 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
+                             <div className="flex justify-between items-start mb-2">
+                                <p className="text-[11px] font-bold text-slate-500 leading-relaxed pr-8 max-w-[85%]">{q.text}</p>
+                                <p className={`text-[14px] font-black whitespace-nowrap ${score >= 4 ? 'text-emerald-600' : score <= 2 ? 'text-rose-600' : 'text-slate-800'}`}>
+                                  {score} / 5
+                                </p>
+                             </div>
+                             {remark && (
+                               <div className="mt-3 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                                  <p className="text-[10px] text-amber-800 font-bold italic leading-relaxed">
+                                    Strategic Remark: {remark}
+                                  </p>
+                               </div>
+                             )}
+                          </div>
+                        );
+                      })}
                       <div className="bg-slate-50 px-6 py-5 flex justify-end items-center gap-6">
-                         <span className="text-[14px] font-black text-slate-800 uppercase tracking-tight">Category Subtotal:</span>
+                         <span className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Subtotal:</span>
                          <span className="text-[16px] font-black text-slate-900">{subEarned} / {subMax}</span>
                       </div>
                    </div>
@@ -113,50 +132,46 @@ const ReportDetail = () => {
            })}
         </div>
 
-        {/* Visual Evidence Log */}
-        <div className="mt-24 page-break-before">
-           <div className="flex items-center gap-4 mb-4">
-              <h3 className="text-[24px] font-[900] text-[#0f172a]">Visual Evidence Log</h3>
-           </div>
-           <div className="h-[2px] bg-[#C9A84C] w-full mb-12" />
+        {/* Visual Evidence Vault */}
+        {audit.photos && audit.photos.length > 0 && (
+          <div className="mt-24 page-break-before">
+             <div className="flex items-center gap-4 mb-8">
+                <div className="w-[6px] h-8 bg-[#C9A84C] rounded-full" />
+                <h3 className="text-[24px] font-[900] text-[#0f172a] italic uppercase tracking-tight">Visual Evidence Vault</h3>
+             </div>
 
-           <div className="space-y-8">
-              {audit.photos.map(photo => {
-                const q = auditQuestions.find(aq => aq.id === photo.questionId);
-                const score = audit.scores[photo.questionId] || 0;
-                const isNegative = score < 3;
-
-                return (
-                  <div key={photo.id} className="bg-white rounded-[24px] border border-slate-100 p-8 shadow-md">
-                     <div className="flex justify-between items-center mb-6">
-                        <h4 className="text-[18px] font-black text-slate-800">{q?.text.split(':')[0] || 'Observation'}</h4>
-                        <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${isNegative ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'}`}>
-                          {isNegative ? 'NEGATIVE (-)' : 'POSITIVE (+)'}
-                        </span>
+             <div className="grid grid-cols-2 gap-8">
+                {audit.photos.map(photo => (
+                  <div key={photo.id} className="bg-white rounded-[24px] border border-slate-100 overflow-hidden shadow-md page-break-inside-avoid">
+                     <img src={photo.uri} className="w-full h-48 object-cover border-bottom border-slate-100" alt="Evidence" />
+                     <div className="p-6">
+                        <div className="flex justify-between items-center mb-4">
+                           <h4 className="text-[12px] font-black text-slate-800 uppercase tracking-tight truncate max-w-[70%]">{photo.title}</h4>
+                           <span className={`px-3 py-1 rounded-full text-[7px] font-black uppercase tracking-widest ${photo.tag === 'negative' ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                             {photo.tag === 'negative' ? 'At Risk' : 'Compliance'}
+                           </span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 font-medium italic leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">
+                          "{photo.remark}"
+                        </p>
+                        <p className="text-[8px] text-slate-300 font-bold uppercase tracking-widest mt-4">Captured: {new Date(photo.timestamp).toLocaleTimeString()}</p>
                      </div>
-                     
-                     <img src={photo.uri} className="w-full h-auto rounded-[20px] mb-6 object-cover max-h-[500px]" alt="Evidence" />
-                     
-                     <div className="bg-slate-50 rounded-2xl p-6 border-l-[6px] border-[#C9A84C]">
-                        <p className="text-[13px] text-slate-500 font-medium italic">"{audit.remarks[photo.questionId] || 'No remark recorded.'}"</p>
-                     </div>
-                     
-                     <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest mt-4">Recorded: {new Date(photo.timestamp).toLocaleString()}</p>
                   </div>
-                );
-              })}
-           </div>
-        </div>
+                ))}
+             </div>
+          </div>
+        )}
 
         {/* Final Footer */}
-        <div className="mt-20 border-t border-slate-100 pt-10 text-center text-slate-300 font-bold text-[9px] uppercase tracking-[4px]">
-           © 2026 ESSILORLUXOTTICA RETAIL AUDIT HUB • GHOST SHIELD ARCHIVER
+        <div className="mt-32 border-t border-slate-100 pt-10 text-center text-slate-300 font-black text-[9px] uppercase tracking-[5px] italic">
+           © 2026 ESSILORLUXOTTICA RETAIL AUDIT HUB • GHOST SHIELD ARCHIVER v3.1
         </div>
       </div>
 
       <style>{`
         @media print {
           .page-break-before { page-break-before: always; }
+          .page-break-inside-avoid { page-break-inside: avoid; }
           body { background: white !important; }
         }
       `}</style>

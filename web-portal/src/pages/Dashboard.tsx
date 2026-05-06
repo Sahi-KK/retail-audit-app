@@ -99,35 +99,39 @@ const Dashboard = () => {
               <ChevronDown size={14} className="text-[#C9A84C]" />
             </button>
 
-            <div className="grid grid-cols-1 gap-4 relative z-10">
-              <div className="bg-white/5 rounded-[32px] p-6 border border-white/10 backdrop-blur-md">
-                <p className="text-white/30 text-[9px] font-black uppercase tracking-[3px] mb-1">
-                  {selectedStoreCode === 'ALL' ? 'Fleet Average' : 'Store Rating'}
-                </p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-white text-5xl font-[900] tracking-tighter italic leading-none">{activeScore}</span>
-                  <span className="text-[#C9A84C] text-lg font-black">%</span>
-                </div>
+            <div className="flex justify-center relative z-10 my-10">
+              <div className="w-56 h-56 rounded-full border-[12px] border-white/5 flex flex-col items-center justify-center relative shadow-2xl">
+                 <div 
+                   className="absolute inset-0 rounded-full border-[12px] border-t-[#C9A84C] border-l-[#C9A84C] border-r-[#C9A84C]/30 border-b-[#C9A84C]/10" 
+                   style={{ transform: `rotate(${(activeScore / 100) * 360 - 90}deg)`, opacity: 0.8 }}
+                 />
+                 <span className="text-white text-6xl font-[900] tracking-tighter italic leading-none">{activeScore}</span>
+                 <span className="text-[#C9A84C] text-[10px] font-black uppercase tracking-[4px] mt-2">Compliance</span>
               </div>
             </div>
 
             {fleetStats.totalAudits > 0 && (
-              <div className="mt-8 bg-white/5 rounded-[32px] p-6 border border-white/10 backdrop-blur-md animate-in fade-in duration-700">
-                <div className="flex-row items-center mb-6 flex gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                  <p className="text-white/60 text-[9px] font-black uppercase tracking-[3px]">
-                     Category Performance Metrics
+              <div className="mt-8 bg-white/5 rounded-[40px] p-8 border border-white/5 backdrop-blur-md animate-in fade-in duration-700">
+                <div className="flex items-center mb-8 gap-3">
+                  <Activity size={14} className="text-[#C9A84C]" />
+                  <p className="text-white font-black text-[10px] uppercase tracking-[3px]">
+                     Strategic Performance Map
                   </p>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {activeCategoryStats.map((cat: any) => (
                     <div key={cat.category}>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-white/40 text-[8px] font-black uppercase tracking-widest">{cat.label}</span>
-                        <span className="text-white font-black text-[10px]">{cat.percentage}%</span>
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-white/30 text-[9px] font-black uppercase tracking-widest">{cat.label}</span>
+                        <span className="text-white font-black text-[11px] tracking-tight">{cat.percentage}%</span>
                       </div>
-                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                        <div className={`h-full rounded-full ${cat.percentage >= 85 ? 'bg-emerald-500' : cat.percentage >= 70 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${cat.percentage}%` }} />
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-1000 shadow-[0_0_12px_rgba(201,168,76,0.3)] ${
+                            cat.percentage >= 85 ? 'bg-emerald-500' : cat.percentage >= 70 ? 'bg-[#C9A84C]' : 'bg-rose-500'
+                          }`} 
+                          style={{ width: `${cat.percentage}%` }} 
+                        />
                       </div>
                     </div>
                   ))}

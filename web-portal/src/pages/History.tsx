@@ -20,7 +20,7 @@ const History = () => {
     return allAudits.filter(a => a && a.headerInfo?.auditorId === auth.auditorId);
   }, [allAudits, auth.auditorId]);
 
-  const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbypy7sK63OxQWqR9RzvZ3xMw47pJukssnIdPlRXad0-3o6wblJ5T7lLv19DCpAeKOuL/exec";
+  const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbwJovoCFrraGJbDtJL-xrB7KtsizsBWs1lRXqxkwBqx1mcXxRXpoo5yh6ztb4hllyt7/exec";
   const displayAudits = viewMode === 'local' ? completedAudits : cloudAudits;
 
   const handleOpenInApp = async (audit: any) => {
@@ -288,7 +288,7 @@ const History = () => {
                       // DEEP DISCOVERY: If link is a placeholder, try to fetch it from the detail engine
                       if (selectedCloudAudit.link === "View Report" || !foundUrl) {
                          setIsSyncing(true);
-                         const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbypy7sK63OxQWqR9RzvZ3xMw47pJukssnIdPlRXad0-3o6wblJ5T7lLv19DCpAeKOuL/exec";
+                         const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbwJovoCFrraGJbDtJL-xrB7KtsizsBWs1lRXqxkwBqx1mcXxRXpoo5yh6ztb4hllyt7/exec";
                          fetch(`${CLOUD_SYNC_URL}?action=getAuditDetail&auditId=${selectedCloudAudit.id}`)
                           .then(res => res.json())
                           .then(fullData => {

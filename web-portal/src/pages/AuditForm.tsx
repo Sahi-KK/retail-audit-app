@@ -4,13 +4,15 @@ import { useAuditStore, PhotoEvidence } from '../store/auditStore';
 import { auditQuestions, AuditCategory } from '../data/auditQuestions';
 import { locationData } from '../data/locationData';
 import { ChevronLeft, ChevronRight, CheckCircle2, Building2, Image as ImageIcon, MessageSquare, AlertCircle, TrendingUp, X, Camera, Plus, Minus, Send, Edit3, Trash2, Cloud, ChevronDown, MapPin, Calendar, User } from 'lucide-react';
+import { SubmitModal } from '../components/SubmitModal';
 
 const AuditForm = () => {
   const navigate = useNavigate();
-  const { headerInfo, setHeaderField, scores, setScore, photos, addPhoto, updatePhoto, removePhoto, submitAudit } = useAuditStore();
+  const { headerInfo, setHeaderField, scores, setScore, remarks, setRemark, photos, addPhoto, updatePhoto, removePhoto, submitAudit } = useAuditStore();
+  const [activeRemarkId, setActiveRemarkId] = useState<string | null>(null);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+
   const [currentStep, setCurrentStep] = useState(0);
-  const [syncState, setSyncState] = useState<'idle' | 'syncing' | 'completed'>('idle');
-  const [syncProgress, setSyncProgress] = useState(0);
   const [isHeaderExpanded, setIsHeaderExpanded] = useState(false);
   
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,22 +32,6 @@ const AuditForm = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentStep]);
-
-  useEffect(() => {
-    if (syncState === 'syncing') {
-      const interval = setInterval(() => {
-        setSyncProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setTimeout(() => setSyncState('completed'), 1000);
-            return 100;
-          }
-          return prev + 1.5;
-        });
-      }, 30);
-      return () => clearInterval(interval);
-    }
-  }, [syncState]);
 
   const categories: AuditCategory[] = ['cleanliness', 'merchandising', 'operations', 'staff', 'clinical', 'rayban_meta'].filter(cat => 
     cat !== 'clinical' || headerInfo.storeBrand === 'LensCrafters'
@@ -140,41 +126,16 @@ const AuditForm = () => {
     };
   };
 
-  const handleSubmit = async () => {
-    setSyncState('syncing');
-    await submitAudit(calculateResults());
+  const handleSubmit = () => {
+    setShowSubmitModal(true);
   };
-
-  if (syncState !== 'idle') {
-    return (
-      <div className="min-h-screen bg-[#0A0F1E] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
-        {syncState === 'syncing' ? (
-          <div className="relative z-10 w-full animate-in fade-in zoom-in duration-700 max-w-sm">
-            <div className="w-20 h-20 bg-[#C9A84C]/10 rounded-full flex items-center justify-center mx-auto mb-8 relative">
-               <Cloud className="w-8 h-8 text-[#C9A84C] animate-bounce" />
-               <div className="absolute inset-0 border-4 border-[#C9A84C]/20 border-t-[#C9A84C] rounded-full animate-spin" />
-            </div>
-            <h2 className="text-xl font-[900] text-white mb-2 uppercase tracking-tighter italic">Cloud Sync</h2>
-            <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden mb-4 mt-6">
-               <div className="h-full bg-[#C9A84C]" style={{ width: `${syncProgress}%` }} />
-            </div>
-            <p className="text-[#C9A84C] text-[8px] font-black uppercase tracking-[2px]">{Math.round(syncProgress)}% Active</p>
-          </div>
-        ) : (
-          <div className="relative z-10 w-full animate-in zoom-in duration-500 max-w-sm">
-            <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/30">
-              <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-            </div>
-            <h2 className="text-2xl font-[900] text-white mb-4 italic uppercase">Complete</h2>
-            <button onClick={() => navigate('/')} className="w-full bg-[#C9A84C] text-[#0A0F1E] h-14 rounded-xl font-black text-[10px] uppercase tracking-[3px] shadow-2xl active:scale-95 transition-all mt-8">RETURN TO HUB</button>
-          </div>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#F4F4F6] pb-52">
+      <SubmitModal 
+        isOpen={showSubmitModal} 
+        onClose={() => setShowSubmitModal(false)} 
+      />
       <div className="max-w-2xl mx-auto">
         <input type="file" ref={fileInputRef} onChange={onFilePicked} className="hidden" accept="image/*" />
         
@@ -303,11 +264,35 @@ const AuditForm = () => {
                 </div>
                 <p className="text-lg font-[900] leading-tight text-[#0A0F1E] tracking-tighter">{q.text}</p>
                 <div className="pt-6 border-t border-slate-50">
-                  <div className="flex bg-[#F4F4F6] p-1.5 rounded-2xl border border-slate-100 gap-2">
+                  <div className="flex bg-[#F4F4F6] p-1.5 rounded-2xl border border-slate-100 gap-2 mb-4">
                     {visibleScores.map((val) => (
                       <button key={val} onClick={() => handleScore(q.id, val)} className={`flex-1 h-10 rounded-xl font-black text-base transition-all flex items-center justify-center ${scores[q.id] === val ? 'bg-[#0A0F1E] text-white shadow-lg' : 'text-slate-300'}`}>{val}</button>
                     ))}
                   </div>
+
+                  {activeRemarkId === q.id || remarks[q.id] ? (
+                    <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex items-center gap-2 mb-2 ml-1">
+                        <MessageSquare size={12} className="text-[#C9A84C]" />
+                        <span className="text-[8px] font-black uppercase tracking-[2px] text-slate-400">Strategic Remark</span>
+                      </div>
+                      <textarea 
+                        value={remarks[q.id] || ''}
+                        onChange={(e) => setRemark(q.id, e.target.value)}
+                        placeholder="Detail the observational anomaly..."
+                        rows={2}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] font-bold text-slate-900 outline-none resize-none focus:border-[#C9A84C] transition-all"
+                      />
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={() => setActiveRemarkId(q.id)}
+                      className="flex items-center gap-2 py-2 px-1 text-slate-400 hover:text-[#C9A84C] transition-colors group"
+                    >
+                      <MessageSquare size={14} className="group-hover:scale-110 transition-transform" />
+                      <span className="text-[8px] font-black uppercase tracking-[2px]">Add Observation</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );
