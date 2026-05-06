@@ -142,17 +142,22 @@ export default function RootLayout() {
     return (
       <UpdateGuard>
         <AuthGuard>
-          <View style={{ flex: 1, backgroundColor: '#0A0F1E', alignItems: 'center' }}>
+          <View style={{ flex: 1, backgroundColor: '#020617', alignItems: 'center', justifyContent: 'center' }}>
             <View 
               testID="root-container"
               style={{ 
                 flex: 1, 
                 width: '100%', 
                 maxWidth: 480, 
-                backgroundColor: '#F8FAFC', // slate-50
+                backgroundColor: '#F8FAFC', 
                 borderLeftWidth: 1,
                 borderRightWidth: 1,
-                borderColor: 'rgba(255,255,255,0.1)',
+                borderColor: 'rgba(255,255,255,0.05)',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 20 },
+                shadowOpacity: 0.5,
+                shadowRadius: 50,
+                elevation: 20,
               }}
             >
               <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
