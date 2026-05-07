@@ -286,8 +286,15 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
         console.warn("PDF Payload too large for cloud sync, stripped images to save data integrity.");
       }
       
-      const syncResult = await googleSheetsService.syncAudit(syncPayload.auditData, syncPayload.pdfBase64 as string);
+      const syncPromise = googleSheetsService.syncAudit(syncPayload.auditData, syncPayload.pdfBase64 as string);
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Cloud Response Timeout (12s). Please use 'Save PDF Locally'.")), 12000)
+      );
+
+      const syncResult = await Promise.race([syncPromise, timeoutPromise]) as any;
       setIsSyncing(false);
+      setIsProcessing(false);
       
       if (syncResult.status === 'success') {
         setSyncStatus('success');
@@ -459,24 +466,35 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
             </View>
           </ScrollView>
 
-          {isProcessing ? (
-            <ActivityIndicator color="#0F172A" size="large" />
-          ) : (
-            <View className="gap-y-5 px-2">
-              <Pressable
-                onPress={handleShare}
-                className={`py-6 rounded-[32px] flex-row items-center justify-center active:scale-[0.98] border ${
-                  syncStatus === 'success' ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'
-                }`}
+          {isProcessing && !errorMessage && (
+            <View className="mb-6 items-center">
+              <ActivityIndicator color="#C9A84C" size="large" />
+              <Text className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-4">Cloud Handshake in Progress...</Text>
+              <Pressable 
+                onPress={() => { setIsProcessing(false); setIsSyncing(false); }} 
+                className="mt-4 px-6 py-2 bg-slate-50 rounded-full"
               >
-                <Share2 size={20} color={syncStatus === 'success' ? '#10B981' : '#94A3B8'} />
-                <Text className={`font-bold text-lg ml-4 tracking-tight ${
-                  syncStatus === 'success' ? 'text-emerald-600' : 'text-slate-400'
-                }`}>
-                  {syncStatus === 'success' ? 'Export & Share Report' : 'Share PDF Locally'}
-                </Text>
+                <Text className="text-slate-400 text-[8px] font-black uppercase tracking-widest">Cancel & Export Locally</Text>
               </Pressable>
+            </View>
+          )}
 
+          <View className="gap-y-5 px-2">
+            <Pressable
+              onPress={handleShare}
+              className={`py-6 rounded-[32px] flex-row items-center justify-center active:scale-[0.98] border ${
+                syncStatus === 'success' ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'
+              }`}
+            >
+              <Share2 size={20} color={syncStatus === 'success' ? '#10B981' : '#94A3B8'} />
+              <Text className={`font-bold text-lg ml-4 tracking-tight ${
+                syncStatus === 'success' ? 'text-emerald-600' : 'text-slate-400'
+              }`}>
+                {syncStatus === 'success' ? 'Export & Share Report' : 'Save PDF Locally (No Cloud)'}
+              </Text>
+            </Pressable>
+
+            {!isProcessing && (
               <Pressable
                 onPress={handleFinalize}
                 className={`py-6 rounded-[40px] flex-row items-center justify-center shadow-2xl active:opacity-90 active:scale-[0.98] ${
@@ -492,12 +510,13 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
                   {syncStatus === 'success' ? 'Finish & Exit Audit' : (isEditing ? 'Sync Changes' : 'Authenticate & Certify')}
                 </Text>
               </Pressable>
+            )}
 
-              <Pressable onPress={onClose} className="py-4 items-center justify-center">
-                <Text className="text-slate-300 font-medium text-[10px] uppercase tracking-[3px]">Dismiss</Text>
-              </Pressable>
-            </View>
-          )}
+            <Pressable onPress={onClose} className="py-4 items-center justify-center">
+              <Text className="text-slate-300 font-medium text-[10px] uppercase tracking-[3px]">Dismiss</Text>
+            </Pressable>
+          </View>
+
         </View>
       </View>
     </Modal>
