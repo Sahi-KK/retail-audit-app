@@ -4,7 +4,7 @@
  */
 
 const MASTER_FILE_NAME = "RETAIL_AUDIT_MASTER_DATABASE";
-const MASTER_ARCHIVE_FOLDER = "RETAIL_AUDIT_DOCUMENTS";
+const MASTER_FOLDER_ID = "1eydpcuEIyv20LTvpNJSw65V9qJk3FHc6";
 
 function authorize() {
   DriveApp.getRootFolder();
@@ -153,37 +153,42 @@ function doPost(e) {
 }
 
 function archivePdfReport(base64, name, auditorName, storeName) {
-  let masterFolder = getFileByName(MASTER_ARCHIVE_FOLDER, "folder") || DriveApp.createFolder(MASTER_ARCHIVE_FOLDER);
+  let masterFolder;
+  try {
+    masterFolder = DriveApp.getFolderById(MASTER_FOLDER_ID);
+  } catch (e) {
+    // Fallback if ID is inaccessible
+    masterFolder = getFileByName("RETAIL_AUDIT_DOCUMENTS", "folder") || DriveApp.createFolder("RETAIL_AUDIT_DOCUMENTS");
+  }
   
-  // Auditor Folder
+  // 1. Auditor Sub-Vault
   let auditorFolder;
   const aFolders = masterFolder.getFoldersByName(auditorName);
-  if (aFolders.hasNext()) auditorFolder = aFolders.next();
-  else auditorFolder = masterFolder.createFolder(auditorName);
+  if (aFolders.hasNext()) {
+    auditorFolder = aFolders.next();
+  } else {
+    auditorFolder = masterFolder.createFolder(auditorName);
+  }
 
-  // Store Folder Inside Auditor Folder
+  // 2. Store Sub-Vault
   let storeFolder;
   const sFolders = auditorFolder.getFoldersByName(storeName);
-  if (sFolders.hasNext()) storeFolder = sFolders.next();
-  else storeFolder = auditorFolder.createFolder(storeName);
+  if (sFolders.hasNext()) {
+    storeFolder = sFolders.next();
+  } else {
+    storeFolder = auditorFolder.createFolder(storeName);
+  }
   
+  // 3. Save PDF
   const bytes = Utilities.base64Decode(base64);
   const blob = Utilities.newBlob(bytes, MimeType.PDF, name);
   const file = storeFolder.createFile(blob);
   
+  // 4. Set Enterprise Permissions
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   storeFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   
   return { fileUrl: file.getUrl(), folderUrl: storeFolder.getUrl() };
-}
-
-function getFileByName(name, type) {
-  const iterator = type === "spreadsheet" ? DriveApp.getFilesByName(name) : DriveApp.getFoldersByName(name);
-  while (iterator.hasNext()) {
-    const item = iterator.next();
-    if (!item.isTrashed()) return item;
-  }
-  return null;
 }
 
 function getFileByName(name, type) {

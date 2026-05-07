@@ -12,6 +12,7 @@ on:
       - 'store/**'
       - 'hooks/**'
       - 'assets/**'
+      - 'data/**'
       - 'package.json'
 
 jobs:

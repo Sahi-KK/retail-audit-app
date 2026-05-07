@@ -22,27 +22,15 @@ export const auditQuestions: AuditQuestion[] = [
     maxScore: 5
   },
   {
-    id: 'c3',
-    category: 'cleanliness',
-    text: 'Cleaning Tools: Are staff utilizing clean, brand-approved microfiber cloths (no dirty or frayed rags) to maintain the inventory?',
-    maxScore: 5
-  },
-  {
     id: 'c4',
     category: 'cleanliness',
     text: 'Dedicated Mirror Spotlessness: Are all full-length floor mirrors and tabletop try-on mirrors completely pristine, free of streaks, fingerprints, and smudges?',
     maxScore: 5
   },
   {
-    id: 'c5',
-    category: 'cleanliness',
-    text: 'Illumination & Acrylic Dust Control: Are all overhead LEDs and shelf lightboxes fully functional, and are the brightly lit acrylic glorifiers completely free of accumulated dust?',
-    maxScore: 5
-  },
-  {
     id: 'c6',
     category: 'cleanliness',
-    text: 'Cash Wrap / POS Hygiene: Is the primary checkout counter completely clear of staff\'s personal items, stray paperwork, and clutter, with a visibly sanitized payment terminal?',
+    text: 'Cashdesk Hygiene: Is the cashdesk clean and free of personal items, with the laptop or device properly placed on it?',
     maxScore: 5
   },
   {
@@ -54,7 +42,7 @@ export const auditQuestions: AuditQuestion[] = [
   {
     id: 'c8',
     category: 'cleanliness',
-    text: 'Store Ambiance: Is the store climate maintained at a comfortable level, and is the officially approved corporate playlist playing at a conversation-friendly volume?',
+    text: 'Store Ambiance: Is the store climate maintained at a comfortable level for customers?',
     maxScore: 5
   },
 
@@ -62,25 +50,25 @@ export const auditQuestions: AuditQuestion[] = [
   {
     id: 'm1',
     category: 'merchandising',
-    text: 'Primary Front Store & Campaign: Is the primary front store window and Celebration Table (displaying alternative articles) featuring the mandated Tone of Voice Campaign, with zero expired marketing visible?',
+    text: 'Front Facade & Campaign: Is the updated marketing campaign featured on the front facade, with zero expired marketing visible?',
     maxScore: 5
   },
   {
     id: 'm2',
     category: 'merchandising',
-    text: 'Key Equity Placements & NPIs: Are the highest-volume anchor brands and New Product Introductions (NPIs) positioned strictly in the designated eye-level zones?',
+    text: 'Key Equity Placements & NPIs: Are brands placed in correct rows? (Rows 1-3 = CO, Rows 4-5 = NPI, Rows 6-8 = Best Sellers)',
     maxScore: 5
   },
   {
     id: 'm4',
     category: 'merchandising',
-    text: 'Price Tags Compliance: Are all frame price tags present and correctly positioned? (Scoring: 0 for No/Missing, 5 for Yes/Perfect)',
+    text: 'Price Tags Compliance: Are all price tags attached to the articles? (Scoring: 0 for No/Missing, 5 for Yes)',
     maxScore: 5
   },
   {
     id: 'm5',
     category: 'merchandising',
-    text: 'VM Mapping: Do the physical frames placed on acrylic glorifiers exactly match the specific model featured in the VM Mapping graphic positioned behind them?',
+    text: 'VM Mapping: Do the physical frames match the specific model featured in the 10x10 tool or graphic holders adjacent to them?',
     maxScore: 5
   },
   {
@@ -95,36 +83,25 @@ export const auditQuestions: AuditQuestion[] = [
     text: 'Cash Desk Communication: Are the three core communications present (Sunperks Loyalty, Brand Promotion, and Seasonal Promotion)? Is the desk surface clutter-free?',
     maxScore: 5
   },
-  {
-    id: 'm9',
-    category: 'merchandising',
-    text: 'Format Specific Branding: If Old Format, are all 10x10 tools perfect? If Skin Format, is all brand-specific branding flawless? (Scoring: 0 for No, 5 for Yes)',
-    maxScore: 5
-  },
+
 
   // Tab 3: Store Operations & Asset Protection
   {
     id: 'o1',
     category: 'operations',
-    text: 'High-Value Asset Security: Are all designated luxury cabinets physically locked, and are the keys secured on a manager\'s person at all times?',
+    text: 'Asset Security: Are all designated cabinets physically locked, and are the keys secured on a manager\'s person at all times?',
     maxScore: 5
   },
   {
     id: 'o2',
     category: 'operations',
-    text: 'Core Bestseller Availability: Are the brand\'s historically top-selling anchor SKUs physically in stock and properly merchandised on the floor?',
+    text: 'Core Bestseller Availability: Are the brand\'s historically top-selling anchor SKUs physically in stock and properly merchandised?',
     maxScore: 5
   },
   {
     id: 'o3',
     category: 'operations',
-    text: 'Omnichannel Readiness: Are the store’s iPads/tablets fully charged, physically present on the floor, and accessible to process "Ship-to-Home" orders?',
-    maxScore: 5
-  },
-  {
-    id: 'o4',
-    category: 'operations',
-    text: 'Cash Wrap & Supply Readiness: Is the POS area fully stocked with supplies (premium shopping bags, hard cases, receipt paper) so the associate never has to abandon a customer?',
+    text: 'Omnichannel Readiness: Does the store have a designated iPad or device for assistance? (If no, mark 5; if yes, mark based on its current functionality).',
     maxScore: 5
   },
   {
@@ -299,6 +276,12 @@ export const auditQuestions: AuditQuestion[] = [
     id: 'rm12',
     category: 'rayban_meta',
     text: 'Success Handover: Did the staff proactively commit to a post-purchase setup walkthrough of the Meta AI app and charging case?',
+    maxScore: 5
+  },
+  {
+    id: 's9',
+    category: 'staff',
+    text: 'Cleaning Tools Maintenance: Are staff utilizing clean, brand-approved microfiber cloths (no dirty or frayed rags) to maintain the inventory?',
     maxScore: 5
   }
 ];
