@@ -24,7 +24,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
   const [pdfUri, setPdfUri] = React.useState<string | null>(null);
   const [pdfTooLarge, setPdfTooLarge] = React.useState(false);
   
-  const { headerInfo, photos, scores, remarks, submitAudit, isReadOnly, activeAuditId } = useAuditStore();
+  const { headerInfo, photos, scores, remarks, submitAudit, saveDraft, isReadOnly, activeAuditId } = useAuditStore();
   const { percentage, earnedScore, totalMaxScore, categoryScores } = useScoreCalc();
   const params = useLocalSearchParams();
   const isEditing = params.isEditMode === 'true';
@@ -243,6 +243,10 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       }
 
       const finalId = activeAuditId || Date.now().toString();
+      
+      // ZERO-LOSS PROTOCOL: Save locally as a draft BEFORE attempting cloud sync
+      saveDraft({ percentage, earned: earnedScore, total: totalMaxScore });
+      
       const html = await generateHtml();
       
       let base64 = null;

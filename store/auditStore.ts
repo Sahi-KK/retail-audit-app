@@ -78,6 +78,7 @@ interface AuditStore {
   loadAudit: (audit: SavedAudit) => void;
   setReadOnly: (val: boolean) => void;
   submitAudit: (stats: { percentage: number, earned: number, total: number }) => void;
+  saveDraft: (stats: { percentage: number, earned: number, total: number }) => void;
   markAsSynced: (auditId: string, cloudFileUrl?: string) => void;
   deleteAudit: (auditId: string) => void;
   resetAudit: () => void;
@@ -250,6 +251,36 @@ export const useAuditStore = create<AuditStore>()(
             remarks: {},
             photos: []
           };
+        });
+      },
+
+      saveDraft: (stats) => {
+        const state = get();
+        const auditId = state.activeAuditId || Date.now().toString();
+        
+        const draftAudit: SavedAudit = {
+          id: auditId,
+          headerInfo: state.headerInfo,
+          scores: state.scores,
+          remarks: state.remarks,
+          photos: state.photos,
+          finalPercentage: stats.percentage,
+          finalScore: stats.earned,
+          totalMax: stats.total,
+          completedAt: new Date().toISOString(),
+          isDraft: true,
+          isSynced: false
+        };
+
+        set((state) => {
+          const index = state.completedAudits.findIndex(a => a.id === auditId);
+          let newCompleted = [...state.completedAudits];
+          if (index !== -1) {
+            newCompleted[index] = draftAudit;
+          } else {
+            newCompleted = [draftAudit, ...newCompleted];
+          }
+          return { completedAudits: newCompleted };
         });
       },
 
