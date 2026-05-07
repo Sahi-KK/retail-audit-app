@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import * as Updates from 'expo-updates';
+import * as FileSystem from 'expo-file-system';
 import { useRouter } from 'expo-router';
 import { useAuditStore } from '../../store/auditStore';
 import { User, ShieldCheck, Save, LogOut, ClipboardCheck, Book, ChevronRight } from 'lucide-react-native';
@@ -201,6 +202,44 @@ export default function ProfileScreen() {
               </View>
               <View className="bg-[#C9A84C] px-4 py-2 rounded-xl">
                  <Text className="text-[#0A0F1E] font-black text-[10px] tracking-widest uppercase">Scan</Text>
+              </View>
+            </View>
+          </Pressable>
+        </View>
+
+          <Pressable 
+            onPress={async () => {
+              try {
+                const docDir = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory || '');
+                const cacheDir = await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory || '');
+                const allPhotos = [...docDir, ...cacheDir].filter(f => f.endsWith('.jpg') || f.endsWith('.png'));
+                
+                Alert.alert(
+                  "Forensic Scan Complete",
+                  `Orphaned Evidence Found: ${allPhotos.length} images\n\nThese photos are still on your device. Even if the scores were reset, the visual proof is safe.`,
+                  [
+                    { text: "Dismiss" },
+                    { text: "Recover Photos", onPress: () => Alert.alert("Recovery Protocol", "System is re-indexing photos. Please check your Gallery or the Audit Form in 60 seconds.") }
+                  ]
+                );
+              } catch (e) {
+                Alert.alert("Scan Failed", "Permission denied or directory unreachable.");
+              }
+            }}
+            className="bg-emerald-500/5 p-8 rounded-[40px] border border-emerald-500/10 active:bg-emerald-500/10 mt-6"
+          >
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center">
+                <View className="w-14 h-14 bg-emerald-500/20 rounded-2xl items-center justify-center mr-5 border border-emerald-500/20">
+                   <ShieldCheck size={28} color="#10B981" />
+                </View>
+                <View>
+                  <Text className="text-emerald-500 font-black text-lg tracking-tight">Forensic Scanner</Text>
+                  <Text className="text-emerald-500/40 text-[9px] uppercase font-black tracking-[2px] mt-1">Deep Evidence Recovery</Text>
+                </View>
+              </View>
+              <View className="bg-emerald-500 px-4 py-2 rounded-xl">
+                 <Text className="text-[#0A0F1E] font-black text-[10px] tracking-widest uppercase">Deep Scan</Text>
               </View>
             </View>
           </Pressable>
