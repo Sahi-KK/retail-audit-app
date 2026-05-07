@@ -173,6 +173,37 @@ export default function ProfileScreen() {
             </View>
             <ChevronRight size={20} color="#C9A84C" opacity={0.5} />
           </Pressable>
+
+          <Pressable 
+            onPress={() => {
+              const count = useAuditStore.getState().completedAudits.length;
+              const hasActive = Object.keys(useAuditStore.getState().scores).length > 0;
+              Alert.alert(
+                "Memory Diagnostic",
+                `Total Audits in Vault: ${count}\nUnsaved Progress Detected: ${hasActive ? 'YES' : 'NO'}\n\nIf you don't see your audit, try clicking 'Deep Re-Hydrate'.`,
+                [
+                  { text: "Dismiss" },
+                  { text: "Deep Re-Hydrate", onPress: () => Updates.reloadAsync() }
+                ]
+              );
+            }}
+            className="bg-[#C9A84C]/5 p-8 rounded-[40px] border border-[#C9A84C]/10 active:bg-[#C9A84C]/10"
+          >
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center">
+                <View className="w-14 h-14 bg-[#C9A84C]/20 rounded-2xl items-center justify-center mr-5 border border-[#C9A84C]/20">
+                  <User size={28} color="#C9A84C" />
+                </View>
+                <View>
+                  <Text className="text-[#C9A84C] font-black text-lg tracking-tight">Deep Recovery</Text>
+                  <Text className="text-[#C9A84C]/40 text-[9px] uppercase font-black tracking-[2px] mt-1">Internal Memory Scan</Text>
+                </View>
+              </View>
+              <View className="bg-[#C9A84C] px-4 py-2 rounded-xl">
+                 <Text className="text-[#0A0F1E] font-black text-[10px] tracking-widest uppercase">Scan</Text>
+              </View>
+            </View>
+          </Pressable>
         </View>
 
         <View className="mt-16 p-10 bg-black/20 rounded-[56px] border border-white/5">
