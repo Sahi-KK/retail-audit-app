@@ -125,6 +125,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({ isOpen, onClose }) => 
             <div>
               <h1 style="margin:0; font-size: 28px; text-transform: uppercase;">Retail Audit Report</h1>
               <p style="color: #666; margin: 5px 0;">Store: ${headerInfo.storeCode} - ${headerInfo.store}</p>
+              <p style="color: #666; margin: 5px 0;">City: ${headerInfo.city || 'Bengaluru'}</p>
               <p style="color: #666; margin: 5px 0;">Auditor: ${headerInfo.auditorName}</p>
               <p style="color: #666; margin: 5px 0;">Date: ${headerInfo.date}</p>
             </div>

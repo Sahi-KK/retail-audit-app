@@ -24,5 +24,11 @@ export const locationData: LocationDatabase = {
       { name: "Lenscrafters, 100 feet road (Indiranagar)", code: "LC-IND-100", brand: "LensCrafters" },
       { name: "Lenscrafters, Mall of Asia", code: "LC-MOA-88", brand: "LensCrafters" }
     ]
+  },
+  "Delhi NCR": {
+    "Delhi/Gurgaon": []
+  },
+  "Maharashtra": {
+    "Mumbai": []
   }
 };

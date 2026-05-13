@@ -56,7 +56,7 @@ interface AuditStore {
   photos: PhotoEvidence[];
   completedAudits: SavedAudit[];
   cloudAudits: any[];
-  customStores: { name: string, code: string, brand: StoreBrand }[];
+  customStores: { name: string, code: string, brand: StoreBrand, city: string }[];
   terminology: Terminology[];
   
   updateAuth: (name: string, id: string) => void;
@@ -71,9 +71,9 @@ interface AuditStore {
   startNewAudit: () => void;
   loadAudit: (audit: SavedAudit) => void;
   markAsSynced: (auditId: string, cloudFileId: string, vaultLink?: string) => void;
-  addCustomStore: (store: { name: string, code: string, brand: StoreBrand }) => void;
+  addCustomStore: (store: { name: string, code: string, brand: StoreBrand, city: string }) => void;
   deleteCustomStore: (code: string) => void;
-  updateStore: (code: string, updates: Partial<{ name: string, code: string, brand: StoreBrand }>) => void;
+  updateStore: (code: string, updates: Partial<{ name: string, code: string, brand: StoreBrand, city: string }>) => void;
   syncFromCloud: () => Promise<void>;
   addTerm: (term: Terminology) => void;
   deleteTerm: (id: string) => void;

@@ -178,6 +178,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
               <div class="header-info" style="margin-top: 15px;">
                 <p><strong>Brand:</strong> ${headerInfo.storeBrand}</p>
                 <p><strong>Store:</strong> ${headerInfo.storeCode} - ${headerInfo.store}</p>
+                <p><strong>City:</strong> ${headerInfo.city || 'Bengaluru'}</p>
                 <p><strong>Auditor:</strong> ${headerInfo.auditorName}</p>
                 <p><strong>Date:</strong> ${headerInfo.date}</p>
               </div>

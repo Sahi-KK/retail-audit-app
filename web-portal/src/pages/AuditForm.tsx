@@ -24,10 +24,12 @@ const AuditForm = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { customStores } = useAuditStore();
 
-  const bengaluruStores = useMemo(() => [
-    ...(customStores || []),
-    ...locationData["Karnataka"]["Bengaluru"].filter(s => s && s.code !== 'CUSTOM')
-  ], [customStores]);
+  const activeStores = useMemo(() => {
+    const city = headerInfo.city || 'Bengaluru';
+    const defaults = (locationData["Karnataka"]?.[city] || []).filter(s => s && s.code !== 'CUSTOM');
+    const custom = (customStores || []).filter(s => s.city === city || (!s.city && city === 'Bengaluru'));
+    return [...custom, ...defaults];
+  }, [customStores, headerInfo.city]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -205,13 +207,29 @@ const AuditForm = () => {
               </button>
             ) : (
               <div className="space-y-4">
-                 <div className="grid grid-cols-2 gap-3">
+                 <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[7px] font-black text-white/30 uppercase tracking-widest">City</label>
+                      <select 
+                        value={headerInfo.city || 'Bengaluru'}
+                        onChange={(e) => {
+                          setHeaderField('city', e.target.value);
+                          setHeaderField('store', '');
+                          setHeaderField('storeCode', '');
+                        }}
+                        className="w-full bg-white/5 h-10 rounded-lg px-3 text-white text-[9px] font-bold border border-white/5 outline-none appearance-none cursor-pointer"
+                      >
+                        <option value="Bengaluru">Bengaluru</option>
+                        <option value="Delhi/Gurgaon">Delhi/Gurgaon</option>
+                        <option value="Mumbai">Mumbai</option>
+                      </select>
+                    </div>
                     <div className="space-y-1">
                       <label className="text-[7px] font-black text-white/30 uppercase tracking-widest">Select Location</label>
                       <select 
                         value={headerInfo.storeCode}
                         onChange={(e) => {
-                          const store = bengaluruStores.find(s => s.code === e.target.value);
+                          const store = activeStores.find(s => s.code === e.target.value);
                           if (store) {
                             setHeaderField('store', store.name);
                             setHeaderField('storeCode', store.code);
@@ -221,7 +239,7 @@ const AuditForm = () => {
                         className="w-full bg-white/5 h-10 rounded-lg px-3 text-white text-[9px] font-bold border border-white/5 outline-none appearance-none cursor-pointer"
                       >
                         <option value="" disabled>Choose Mall...</option>
-                        {bengaluruStores.map(s => (
+                        {activeStores.map(s => (
                           <option key={s.code} value={s.code}>
                             {s.brand === 'LensCrafters' ? (s.name.split(',')[1]?.trim() || s.name) : s.name.split(',')[0]}
                           </option>

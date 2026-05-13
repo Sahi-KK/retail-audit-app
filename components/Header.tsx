@@ -58,13 +58,15 @@ export function Header() {
       originalName: st.name
     }));
 
-    const custom = (customStores || []).map((st: any) => ({
-      label: `${st.name} (${st.brand})`,
-      value: st.code,
-      sublabel: st.code,
-      brand: st.brand,
-      originalName: st.name
-    }));
+    const custom = (customStores || [])
+      .filter((st: any) => st.city === headerInfo.city || (!st.city && headerInfo.city === 'Bengaluru'))
+      .map((st: any) => ({
+        label: `${st.name} (${st.brand})`,
+        value: st.code,
+        sublabel: st.code,
+        brand: st.brand,
+        originalName: st.name
+      }));
 
     return [...custom, ...defaults];
   }, [headerInfo.state, headerInfo.city, customStores]);

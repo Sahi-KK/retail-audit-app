@@ -12,10 +12,12 @@ const ManageStores = () => {
   const [newName, setNewName] = useState('');
   const [newCode, setNewCode] = useState('');
   const [newBrand, setNewBrand] = useState<StoreBrand>('Sunglass Hut');
+  const [newCity, setNewCity] = useState('Bengaluru');
 
   const [editingCode, setEditingCode] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editBrand, setEditBrand] = useState<StoreBrand>('Sunglass Hut');
+  const [editCity, setEditCity] = useState('Bengaluru');
 
   const allStores = useMemo(() => {
     const defaults = locationData["Karnataka"]["Bengaluru"];
@@ -33,7 +35,7 @@ const ManageStores = () => {
 
   const handleAddStore = () => {
     if (!newName || !newCode) return;
-    addCustomStore({ name: newName, code: newCode, brand: newBrand });
+    addCustomStore({ name: newName, code: newCode, brand: newBrand, city: newCity });
     setNewName('');
     setNewCode('');
     setIsAddExpanded(false);
@@ -41,7 +43,7 @@ const ManageStores = () => {
 
   const handleUpdate = () => {
     if (!editingCode) return;
-    updateStore(editingCode, { name: editName, brand: editBrand });
+    updateStore(editingCode, { name: editName, brand: editBrand, city: editCity });
     setEditingCode(null);
   };
 
@@ -81,7 +83,7 @@ const ManageStores = () => {
 
             {isAddExpanded && (
               <div className="mt-4 bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm animate-in slide-in-from-top duration-300">
-                <div className="flex gap-2 mb-8">
+                <div className="flex gap-2 mb-4">
                   {(['Sunglass Hut', 'LensCrafters'] as const).map(b => (
                     <button
                       key={b}
@@ -89,6 +91,18 @@ const ManageStores = () => {
                       className={`flex-1 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${newBrand === b ? 'bg-[#0A0F1E] text-white' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}
                     >
                       {b}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 mb-8">
+                  {(['Bengaluru', 'Delhi/Gurgaon', 'Mumbai'] as const).map(c => (
+                    <button
+                      key={c}
+                      onClick={() => setNewCity(c)}
+                      className={`flex-1 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${newCity === c ? 'bg-[#C9A84C] text-slate-900' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}
+                    >
+                      {c}
                     </button>
                   ))}
                 </div>
@@ -140,7 +154,7 @@ const ManageStores = () => {
                   </div>
                   <div className="flex gap-2">
                      <button 
-                      onClick={() => { setEditingCode(store.code); setEditName(store.name); setEditBrand(store.brand); }}
+                      onClick={() => { setEditingCode(store.code); setEditName(store.name); setEditBrand(store.brand); setEditCity(store.city || 'Bengaluru'); }}
                       className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 hover:bg-[#0A0F1E] hover:text-white transition-all"
                      >
                         <Edit3 size={16} />
@@ -155,8 +169,13 @@ const ManageStores = () => {
                 </div>
                 
                 <div className="flex items-center justify-between pt-6 border-t border-slate-50">
-                   <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
-                      <span className="text-slate-400 text-[10px] font-black tracking-widest uppercase">{store.code}</span>
+                   <div className="flex items-center gap-2">
+                     <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                        <span className="text-slate-400 text-[10px] font-black tracking-widest uppercase">{store.code}</span>
+                     </div>
+                     <div className="bg-slate-100 px-4 py-2 rounded-xl">
+                        <span className="text-slate-500 text-[9px] font-black uppercase tracking-widest">{store.city || 'Bengaluru'}</span>
+                     </div>
                    </div>
                    <div className="flex items-center gap-2">
                       <CheckCircle2 size={14} className="text-emerald-500" />
@@ -190,6 +209,18 @@ const ManageStores = () => {
                       className={`flex-1 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${editBrand === b ? 'bg-[#0A0F1E] text-white' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}
                     >
                       {b}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  {(['Bengaluru', 'Delhi/Gurgaon', 'Mumbai'] as const).map(c => (
+                    <button
+                      key={c}
+                      onClick={() => setEditCity(c)}
+                      className={`flex-1 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${editCity === c ? 'bg-[#C9A84C] text-slate-900' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}
+                    >
+                      {c}
                     </button>
                   ))}
                 </div>
