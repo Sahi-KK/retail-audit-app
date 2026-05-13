@@ -30,9 +30,12 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
   const params = useLocalSearchParams();
   const isEditing = params.isEditMode === 'true';
 
-  const generateHtml = async () => {
-    // 1. Generate Category Tables
-    const isLensCrafters = headerInfo?.storeBrand === 'LensCrafters';
+    const generateHtml = async () => {
+      // 1. Generate Category Tables
+      const isLensCrafters = headerInfo?.storeBrand === 'LensCrafters';
+      const { customStores } = useAuditStore.getState();
+      const currentStore = (customStores || []).find((s: any) => s.code === headerInfo.storeCode);
+      const resolvedCity = headerInfo.city || currentStore?.city || 'Bengaluru';
     
     const categories: { key: AuditCategory; label: string }[] = [
       { key: 'cleanliness', label: 'Cleanliness & Hygiene' },
@@ -179,7 +182,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
               <div class="header-info" style="margin-top: 15px;">
                 <p><strong>Brand:</strong> ${headerInfo.storeBrand}</p>
                 <p><strong>Store:</strong> ${headerInfo.storeCode} - ${headerInfo.store}</p>
-                <p><strong>City:</strong> ${headerInfo.city || 'Bengaluru'}</p>
+                <p><strong>City:</strong> ${resolvedCity}</p>
                 <p><strong>Auditor:</strong> ${headerInfo.auditorName}</p>
                 <p><strong>Date:</strong> ${headerInfo.date}</p>
               </div>
