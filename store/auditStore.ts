@@ -62,7 +62,7 @@ interface AuditStore {
   
   // History & Custom Data
   completedAudits: SavedAudit[];
-  customStores: { name: string, code: string, brand: StoreBrand }[];
+  customStores: { name: string, code: string, brand: StoreBrand, city: string }[];
   terminology: Terminology[];
   isReadOnly: boolean;
   
@@ -84,9 +84,9 @@ interface AuditStore {
   resetAudit: () => void;
   
   // Custom Store Management
-  addCustomStore: (store: { name: string, code: string, brand: StoreBrand }) => void;
+  addCustomStore: (store: { name: string, code: string, brand: StoreBrand, city: string }) => void;
   deleteCustomStore: (code: string) => void;
-  updateStore: (code: string, updatedStore: { name: string, code: string, brand: StoreBrand }) => void;
+  updateStore: (code: string, updatedStore: { name: string, code: string, brand: StoreBrand, city: string }) => void;
   
   // Terminology Management
   addTerm: (term: Terminology) => void;

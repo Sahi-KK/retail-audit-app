@@ -17,12 +17,14 @@ export default function ManageStoresScreen() {
   const [newName, setNewName] = React.useState('');
   const [newCode, setNewCode] = React.useState('');
   const [newBrand, setNewBrand] = React.useState<'Sunglass Hut' | 'LensCrafters'>('Sunglass Hut');
+  const [newCity, setNewCity] = React.useState('Bengaluru');
 
   // Edit State
-  const [editingStore, setEditingStore] = React.useState<StoreLocation | null>(null);
+  const [editingStore, setEditingStore] = React.useState<any | null>(null);
   const [editName, setEditName] = React.useState('');
   const [editCode, setEditCode] = React.useState('');
   const [editBrand, setEditBrand] = React.useState<'Sunglass Hut' | 'LensCrafters'>('Sunglass Hut');
+  const [editCity, setEditCity] = React.useState('Bengaluru');
 
   const allStores = React.useMemo(() => {
     const defaults = locationData["Karnataka"]["Bengaluru"];
@@ -43,23 +45,24 @@ export default function ManageStoresScreen() {
       Alert.alert("Required", "Please provide a store name and identification code.");
       return;
     }
-    addCustomStore({ name: newName, code: newCode, brand: newBrand });
+    addCustomStore({ name: newName, code: newCode, brand: newBrand, city: newCity });
     setNewName('');
     setNewCode('');
     setIsAddExpanded(false);
     Alert.alert("Success", "Location registered to directory.");
   };
 
-  const handleEditInit = (store: StoreLocation) => {
+  const handleEditInit = (store: any) => {
     setEditingStore(store);
     setEditName(store.name);
     setEditCode(store.code);
     setEditBrand(store.brand);
+    setEditCity(store.city || 'Bengaluru');
   };
 
   const handleUpdateStore = () => {
     if (!editingStore) return;
-    updateStore(editingStore.code, { name: editName, code: editCode, brand: editBrand });
+    updateStore(editingStore.code, { name: editName, code: editCode, brand: editBrand, city: editCity });
     setEditingStore(null);
     Alert.alert("Updated", "Store profile has been normalized.");
   };
@@ -140,6 +143,21 @@ export default function ManageStoresScreen() {
                 ))}
               </View>
 
+              <View className="flex-row gap-x-2 mb-6">
+                {(['Bengaluru', 'Delhi/Gurgaon', 'Mumbai'] as const).map(c => (
+                  <Pressable
+                    key={c}
+                    onPress={() => setNewCity(c)}
+                    className={`flex-1 py-4 px-1 rounded-2xl border items-center ${newCity === c ? 'bg-[#C9A84C] border-[#C9A84C]' : 'bg-slate-50 border-slate-100'
+                      }`}
+                  >
+                    <Text className={`text-[9px] font-black uppercase tracking-widest ${newCity === c ? 'text-slate-900' : 'text-slate-400'}`}>
+                      {c}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+
               <TextInput
                 className="bg-slate-50 border border-slate-100 rounded-2xl px-6 h-14 text-slate-900 font-bold mb-4"
                 placeholder="Store Name"
@@ -181,6 +199,9 @@ export default function ManageStoresScreen() {
                       <Text className="text-slate-400 text-[11px] font-black tracking-widest uppercase">{store.code}</Text>
                     </View>
                     <Badge brand={store.brand} />
+                    <View className="bg-slate-100 px-3 py-1.5 rounded-lg ml-3">
+                      <Text className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{store.city || 'Bengaluru'}</Text>
+                    </View>
                   </View>
                 </View>
                 <View className="flex-row gap-x-2">
@@ -227,6 +248,21 @@ export default function ManageStoresScreen() {
                   >
                     <Text className={`text-[11px] font-black uppercase tracking-widest ${editBrand === b ? 'text-white' : 'text-slate-400'}`}>
                       {b}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+
+              <View className="flex-row gap-x-3 mb-2">
+                {(['Bengaluru', 'Delhi/Gurgaon', 'Mumbai'] as const).map(c => (
+                  <Pressable
+                    key={c}
+                    onPress={() => setEditCity(c)}
+                    className={`flex-1 py-5 rounded-[24px] border items-center ${editCity === c ? 'bg-[#C9A84C] border-[#C9A84C] shadow-lg' : 'bg-slate-50 border-slate-100'
+                      }`}
+                  >
+                    <Text className={`text-[10px] font-black uppercase tracking-widest ${editCity === c ? 'text-slate-900' : 'text-slate-400'}`}>
+                      {c}
                     </Text>
                   </Pressable>
                 ))}
