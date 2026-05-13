@@ -34,7 +34,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       // 1. Generate Category Tables
       const isLensCrafters = headerInfo?.storeBrand === 'LensCrafters';
       const { customStores } = useAuditStore.getState();
-      const currentStore = (customStores || []).find((s: any) => s.code === headerInfo.storeCode);
+      const currentStore = (customStores || []).find((s: any) => s.code.toLowerCase() === headerInfo.storeCode.toLowerCase());
       const resolvedCity = headerInfo.city || currentStore?.city || 'Bengaluru';
     
     const categories: { key: AuditCategory; label: string }[] = [

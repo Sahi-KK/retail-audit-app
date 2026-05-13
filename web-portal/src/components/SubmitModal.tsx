@@ -22,7 +22,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({ isOpen, onClose }) => 
   const generateReportHtml = () => {
     const isLensCrafters = headerInfo?.storeBrand === 'LensCrafters';
     const { customStores } = useAuditStore.getState();
-    const currentStore = (customStores || []).find((s: any) => s.code === headerInfo.storeCode);
+    const currentStore = (customStores || []).find((s: any) => s.code.toLowerCase() === headerInfo.storeCode.toLowerCase());
     const resolvedCity = headerInfo.city || currentStore?.city || 'Bengaluru';
     const categories = [
       { key: 'cleanliness', label: 'Cleanliness & Hygiene' },
