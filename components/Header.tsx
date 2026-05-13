@@ -26,7 +26,7 @@ export function Header() {
       let store = locationData["Karnataka"]["Bengaluru"].find((s: any) => s.code === storeCode);
       // Search in custom stores if not found
       if (!store) {
-        store = (customStores || []).find((s: any) => s.code === storeCode);
+        store = (customStores || []).find((s: any) => s.code.toLowerCase() === storeCode.toLowerCase());
       }
 
       if (store) {

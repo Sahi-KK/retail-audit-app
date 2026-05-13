@@ -273,10 +273,6 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       // GHOST SHIELD: Increased limit to 45MB (Google Apps Script limit is 50MB)
       const isTooLarge = base64 && base64.length > 45 * 1024 * 1024;
       
-      const { customStores } = useAuditStore.getState();
-      const currentStore = (customStores || []).find((s: any) => s.code.toLowerCase() === headerInfo.storeCode.toLowerCase());
-      const resolvedCity = headerInfo.city || currentStore?.city || 'Bengaluru';
-      
       const safeHeader = {
         ...headerInfo,
         city: resolvedCity,
