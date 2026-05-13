@@ -6,7 +6,7 @@ import { Search, FileText, ChevronRight, Calendar, Trash2, Pencil, Cloud, Smartp
 import { useAuditStore } from '../../store/auditStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Badge } from '../../components/Badge';
-import { googleSheetsService } from '../../services/googleSheets';
+import { googleSheetsService, CLOUD_SYNC_URL } from '../../services/googleSheets';
 
 export default function GlobalHistoryScreen() {
 
@@ -119,7 +119,7 @@ export default function GlobalHistoryScreen() {
         timestamp: item.completedAt
       };
 
-      const syncResult = await googleSheetsService.syncAudit(syncPayload, null); // Manual sync usually skip PDF for speed if not already generated
+      const syncResult = await googleSheetsService.syncAudit(syncPayload, undefined); // Manual sync usually skip PDF for speed if not already generated
       if (syncResult.status === 'success') {
         const { markAsSynced } = useAuditStore.getState();
         markAsSynced(item.id);
@@ -224,7 +224,7 @@ export default function GlobalHistoryScreen() {
           onPress: async () => {
             setIsLoadingCloud(true);
             try {
-              const url = `${googleSheetsService.CLOUD_SYNC_URL}?action=getAuditDetail&auditId=${item.id}`;
+              const url = `${CLOUD_SYNC_URL}?action=getAuditDetail&auditId=${item.id}`;
               console.log("Retrieving full data from:", url);
               const response = await fetch(url);
               const fullAudit = await response.json();
@@ -347,7 +347,7 @@ export default function GlobalHistoryScreen() {
               placeholderTextColor="#64748B"
             />
             {viewMode === 'cloud' && (
-              <Pressable onPress={loadCloudHistory}>
+              <Pressable onPress={() => loadCloudHistory()}>
                 <RefreshCw size={18} color="#C9A84C" />
               </Pressable>
             )}

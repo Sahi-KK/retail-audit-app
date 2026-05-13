@@ -160,7 +160,7 @@ export default function ProfileScreen() {
           </Pressable>
 
           <Pressable 
-            onPress={() => router.push('/terminology')}
+            onPress={() => router.push('/terminology' as any)}
             className="bg-white/5 p-8 rounded-[40px] flex-row items-center justify-between border border-white/5 active:bg-white/10"
           >
             <View className="flex-row items-center">
@@ -210,8 +210,8 @@ export default function ProfileScreen() {
           <Pressable 
             onPress={async () => {
               try {
-                const docDir = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory || '');
-                const cacheDir = await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory || '');
+                const docDir = await FileSystem.readDirectoryAsync((FileSystem as any).documentDirectory || '');
+                const cacheDir = await FileSystem.readDirectoryAsync((FileSystem as any).cacheDirectory || '');
                 const allPhotos = [...docDir, ...cacheDir].filter(f => f.endsWith('.jpg') || f.endsWith('.png'));
                 
                 Alert.alert(
@@ -243,7 +243,6 @@ export default function ProfileScreen() {
               </View>
             </View>
           </Pressable>
-        </View>
 
         <View className="mt-16 p-10 bg-black/20 rounded-[56px] border border-white/5">
           <Text className="text-[#C9A84C] font-black text-[10px] uppercase tracking-[4px] mb-6 text-center opacity-80">Security Protocol</Text>

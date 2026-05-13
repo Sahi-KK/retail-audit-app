@@ -23,6 +23,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [pdfUri, setPdfUri] = React.useState<string | null>(null);
   const [pdfTooLarge, setPdfTooLarge] = React.useState(false);
+  const [cloudPdfLink, setCloudPdfLink] = React.useState<string | null>(null);
   
   const { headerInfo, photos, scores, remarks, submitAudit, saveDraft, isReadOnly, activeAuditId } = useAuditStore();
   const { percentage, earnedScore, totalMaxScore, categoryScores } = useScoreCalc();
@@ -304,6 +305,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       if (syncResult.status === 'success') {
         setSyncStatus('success');
         setErrorMessage(null);
+        setCloudPdfLink(syncResult.pdfLink);
       } else {
         setSyncStatus('error');
         setErrorMessage(syncResult.message || 'Check connection');
@@ -382,7 +384,7 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
         // However, submitAudit creates a NEW entry. 
         // We should probably mark the most recent one as synced if it matches finalId
         const { markAsSynced } = useAuditStore.getState();
-        markAsSynced(finalId, (syncResult as any).pdfLink);
+        markAsSynced(finalId, cloudPdfLink || '');
         onClose();
         router.replace('/');
       }

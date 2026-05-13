@@ -4,6 +4,7 @@ export interface StoreLocation {
   name: string;
   code: string;
   brand: StoreBrand;
+  city?: string;
 }
 
 export type LocationDatabase = Record<string, Record<string, StoreLocation[]>>;

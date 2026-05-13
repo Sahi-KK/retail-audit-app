@@ -1,4 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
+import { Pressable, View, Text } from 'react-native';
+import { Cloud, CloudOff, Calendar, User, ChevronRight } from 'lucide-react-native';
 import { SavedAudit } from '../store/auditStore';
 
 interface HistoryCardProps {
