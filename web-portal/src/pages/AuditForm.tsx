@@ -234,6 +234,7 @@ const AuditForm = () => {
                             setHeaderField('store', store.name);
                             setHeaderField('storeCode', store.code);
                             setHeaderField('storeBrand', store.brand);
+                            setHeaderField('city', (store as any).city || headerInfo.city || 'Bengaluru');
                           }
                         }}
                         className="w-full bg-white/5 h-10 rounded-lg px-3 text-white text-[9px] font-bold border border-white/5 outline-none appearance-none cursor-pointer"
