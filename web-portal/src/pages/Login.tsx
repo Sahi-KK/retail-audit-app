@@ -11,7 +11,8 @@ const Login = () => {
 
   const ALLOWED_ACCOUNTS = [
     { name: 'Krishnakant Singh', id: 'KK13' },
-    { name: 'Sahi', id: 'EMP-001' }
+    { name: 'Sahi', id: 'EMP-001' },
+    { name: 'Test', id: '1234' }
   ];
 
   const handleSignIn = () => {
