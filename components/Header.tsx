@@ -30,8 +30,14 @@ export function Header() {
       }
 
       if (store) {
-        setHeaderField('state', 'Karnataka');
-        setHeaderField('city', 'Bengaluru');
+        const city = (store as any).city || 'Bengaluru';
+        const cityToState: Record<string, string> = {
+          'Bengaluru': 'Karnataka',
+          'Delhi/Gurgaon': 'Delhi NCR',
+          'Mumbai': 'Maharashtra'
+        };
+        setHeaderField('state', cityToState[city] || 'Karnataka');
+        setHeaderField('city', city);
         setHeaderField('store', store.name);
         setHeaderField('storeCode', store.code);
         setHeaderField('storeBrand', store.brand);
