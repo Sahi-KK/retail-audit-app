@@ -249,6 +249,12 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
 
       const finalId = activeAuditId || Date.now().toString();
       
+      const { customStores, setHeaderField } = useAuditStore.getState();
+      const currentStore = (customStores || []).find((s: any) => s.code.toLowerCase() === headerInfo.storeCode.toLowerCase());
+      const resolvedCity = headerInfo.city || currentStore?.city || 'Bengaluru';
+      
+      setHeaderField('city', resolvedCity);
+
       // ZERO-LOSS PROTOCOL: Save locally as a draft BEFORE attempting cloud sync
       saveDraft({ percentage, earned: earnedScore, total: totalMaxScore });
       
@@ -267,8 +273,13 @@ export function SubmitModal({ visible, onClose }: SubmitModalProps) {
       // GHOST SHIELD: Increased limit to 45MB (Google Apps Script limit is 50MB)
       const isTooLarge = base64 && base64.length > 45 * 1024 * 1024;
       
+      const { customStores } = useAuditStore.getState();
+      const currentStore = (customStores || []).find((s: any) => s.code.toLowerCase() === headerInfo.storeCode.toLowerCase());
+      const resolvedCity = headerInfo.city || currentStore?.city || 'Bengaluru';
+      
       const safeHeader = {
         ...headerInfo,
+        city: resolvedCity,
         store: headerInfo.store || 'Unknown Store',
         storeCode: headerInfo.storeCode || 'NA',
         storeBrand: headerInfo.storeBrand || 'Unknown Brand'

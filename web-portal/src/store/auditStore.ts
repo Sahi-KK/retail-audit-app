@@ -164,9 +164,13 @@ export const useAuditStore = create<AuditStore>()(
       submitAudit: async (stats) => {
         const state = get();
         
+        const { customStores } = get();
+        const currentStore = (customStores || []).find((s: any) => s.code.toLowerCase() === state.headerInfo.storeCode.toLowerCase());
+        const resolvedCity = state.headerInfo.city || currentStore?.city || 'Bengaluru';
+
         const newAudit: SavedAudit = {
           id: state.activeAuditId || Date.now().toString(),
-          headerInfo: state.headerInfo,
+          headerInfo: { ...state.headerInfo, city: resolvedCity },
           scores: state.scores,
           remarks: state.remarks,
           photos: state.photos,
